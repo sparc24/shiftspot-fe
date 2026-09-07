@@ -16,7 +16,7 @@ interface FormFieldProps {
 export function FormField({ id, label, error, required = false, hint, children }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium text-gray-700">
+      <label id={`${id}-label`} htmlFor={id} className="text-sm font-medium text-gray-700">
         {label}
         {required ? (
           <span aria-hidden="true" className="text-red-600">

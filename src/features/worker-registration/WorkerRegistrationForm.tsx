@@ -36,6 +36,7 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
         <TextInput
           id="name"
           invalid={!!errors.name}
+          aria-required="true"
           aria-describedby={errors.name ? 'name-error' : undefined}
           {...register('name')}
         />
@@ -46,6 +47,7 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
           id="email"
           type="email"
           invalid={!!errors.email}
+          aria-required="true"
           aria-describedby={errors.email ? 'email-error' : undefined}
           {...register('email')}
         />
@@ -56,6 +58,7 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
           id="phone"
           type="tel"
           invalid={!!errors.phone}
+          aria-required="true"
           aria-describedby={errors.phone ? 'phone-error' : undefined}
           {...register('phone')}
         />
@@ -67,6 +70,7 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
           placeholder="Select a location"
           options={LOCATION_OPTIONS}
           invalid={!!errors.location}
+          aria-required="true"
           aria-describedby={errors.location ? 'location-error' : undefined}
           {...register('location')}
         />
@@ -77,6 +81,7 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
           id="age"
           type="number"
           invalid={!!errors.age}
+          aria-required="true"
           aria-describedby={errors.age ? 'age-error' : undefined}
           {...register('age')}
         />
@@ -88,12 +93,13 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
         render={({ field }) => (
           <FormField id="skills" label="Skills" required error={errors.skills?.message}>
             <MultiSelect
+              id="skills"
               name="skills"
-              legend="Skills"
               options={SKILL_OPTIONS}
               value={field.value}
               onChange={field.onChange}
               invalid={!!errors.skills}
+              describedById={errors.skills ? 'skills-error' : undefined}
             />
           </FormField>
         )}

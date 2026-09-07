@@ -36,4 +36,27 @@ describe('WorkerRegistrationForm', () => {
     expect(submitted.name).toBe('Jane Doe')
     expect(submitted.skills).toContain('cleaning')
   })
+
+  it('associates the Skills group with its label and error for assistive tech', async () => {
+    const user = userEvent.setup()
+    render(<WorkerRegistrationForm onSubmit={vi.fn()} isSubmitting={false} />)
+
+    const skillsGroup = screen.getByLabelText(/skills/i)
+    expect(skillsGroup.tagName).toBe('FIELDSET')
+    expect(skillsGroup).toHaveAttribute('aria-required', 'true')
+
+    await user.click(screen.getByRole('button', { name: /register/i }))
+
+    await waitFor(() => {
+      expect(skillsGroup).toHaveAttribute('aria-describedby', 'skills-error')
+    })
+  })
+
+  it('marks every mandatory field as aria-required', () => {
+    render(<WorkerRegistrationForm onSubmit={vi.fn()} isSubmitting={false} />)
+
+    for (const label of [/name/i, /email/i, /phone/i, /location/i, /age/i]) {
+      expect(screen.getByLabelText(label)).toHaveAttribute('aria-required', 'true')
+    }
+  })
 })
