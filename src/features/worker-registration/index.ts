@@ -1,0 +1,1 @@
+export { WorkerRegistrationPage } from './WorkerRegistrationPage'
