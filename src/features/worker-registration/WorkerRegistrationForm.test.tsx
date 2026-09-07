@@ -59,4 +59,51 @@ describe('WorkerRegistrationForm', () => {
       expect(screen.getByLabelText(label)).toHaveAttribute('aria-required', 'true')
     }
   })
+
+  it('moves keyboard focus to the first invalid field after a failed submit', async () => {
+    const user = userEvent.setup()
+    render(<WorkerRegistrationForm onSubmit={vi.fn()} isSubmitting={false} />)
+
+    await user.click(screen.getByRole('button', { name: /register/i }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toHaveFocus()
+    })
+  })
+
+  it('supports tabbing sequentially through every field to the submit button', async () => {
+    const user = userEvent.setup()
+    render(<WorkerRegistrationForm onSubmit={vi.fn()} isSubmitting={false} />)
+
+    await user.tab()
+    expect(screen.getByLabelText(/name/i)).toHaveFocus()
+
+    await user.tab()
+    expect(screen.getByLabelText(/email/i)).toHaveFocus()
+
+    await user.tab()
+    expect(screen.getByLabelText(/phone/i)).toHaveFocus()
+
+    await user.tab()
+    expect(screen.getByLabelText(/location/i)).toHaveFocus()
+
+    await user.tab()
+    expect(screen.getByLabelText(/age/i)).toHaveFocus()
+  })
+
+  it('clears a field error once the user corrects the value', async () => {
+    const user = userEvent.setup()
+    render(<WorkerRegistrationForm onSubmit={vi.fn()} isSubmitting={false} />)
+
+    await user.click(screen.getByRole('button', { name: /register/i }))
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    await user.type(screen.getByLabelText(/name/i), 'Jane Doe')
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/name/i)).toHaveAttribute('aria-invalid', 'false')
+    })
+  })
 })

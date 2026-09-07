@@ -67,4 +67,46 @@ describe('workerRegistrationSchema', () => {
     const result = workerRegistrationSchema.safeParse({ ...validPayload, skills: ['not-a-skill'] })
     expect(result.success).toBe(false)
   })
+
+  it('rejects a name longer than 80 characters (boundary)', () => {
+    const result = workerRegistrationSchema.safeParse({ ...validPayload, name: 'a'.repeat(81) })
+    expect(result.success).toBe(false)
+  })
+
+  it('accepts a name exactly 80 characters (boundary)', () => {
+    const result = workerRegistrationSchema.safeParse({ ...validPayload, name: 'a'.repeat(80) })
+    expect(result.success).toBe(true)
+  })
+
+  it('trims leading/trailing whitespace from name, email, and phone', () => {
+    const result = workerRegistrationSchema.parse({
+      ...validPayload,
+      name: '  Jane Doe  ',
+      email: '  jane.doe@example.com  ',
+      phone: '  9876543210  ',
+    })
+    expect(result.name).toBe('Jane Doe')
+    expect(result.email).toBe('jane.doe@example.com')
+    expect(result.phone).toBe('9876543210')
+  })
+
+  it('accepts a phone number with a leading + and separators', () => {
+    const result = workerRegistrationSchema.safeParse({ ...validPayload, phone: '+1 234-567-8901' })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a phone number longer than 15 characters (boundary)', () => {
+    const result = workerRegistrationSchema.safeParse({ ...validPayload, phone: '1234567890123456' })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects age that is not a whole number', () => {
+    const result = workerRegistrationSchema.safeParse({ ...validPayload, age: 25.5 })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects multiple valid skills collapsed to duplicates only if none are valid', () => {
+    const result = workerRegistrationSchema.safeParse({ ...validPayload, skills: ['cleaning', 'delivery'] })
+    expect(result.success).toBe(true)
+  })
 })

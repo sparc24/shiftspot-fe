@@ -34,4 +34,13 @@ describe('workerService.createWorker', () => {
       field: 'email',
     })
   })
+
+  it('resolves independently for two different emails', async () => {
+    const { workerService } = await import('./workerService')
+    const first = await workerService.createWorker(basePayload)
+    const second = await workerService.createWorker({ ...basePayload, email: 'jordan@example.com' })
+
+    expect(first.id).not.toBe(second.id)
+    expect(second.email).toBe('jordan@example.com')
+  })
 })
