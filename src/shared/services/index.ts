@@ -1,0 +1,1 @@
+export { workerService } from './workerService'
