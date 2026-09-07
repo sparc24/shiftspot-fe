@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useWorkerRegistration } from '@/shared/hooks'
@@ -34,6 +35,14 @@ function createMutation(overrides: MutationOverrides = {}) {
   } as unknown as ReturnType<typeof useWorkerRegistration>
 }
 
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <WorkerRegistrationPage />
+    </MemoryRouter>,
+  )
+}
+
 describe('WorkerRegistrationPage', () => {
   beforeEach(() => {
     mockedUseWorkerRegistration.mockReset()
@@ -42,10 +51,10 @@ describe('WorkerRegistrationPage', () => {
   it('renders the registration form by default', () => {
     mockedUseWorkerRegistration.mockReturnValue(createMutation())
 
-    render(<WorkerRegistrationPage />)
+    renderPage()
 
-    expect(screen.getByRole('heading', { name: /worker registration/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /register/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /list your skills/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /submit profile/i })).toBeInTheDocument()
   })
 
   it('shows the success message with the worker name after a successful submission', () => {
@@ -53,26 +62,40 @@ describe('WorkerRegistrationPage', () => {
       createMutation({ isSuccess: true, data: { name: 'Jane Doe' } as Worker }),
     )
 
-    render(<WorkerRegistrationPage />)
+    renderPage()
 
     expect(screen.getByRole('status')).toHaveTextContent(/thanks, jane doe/i)
-    expect(screen.queryByRole('button', { name: /register/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /submit profile/i })).not.toBeInTheDocument()
   })
 
-  it('shows the duplicate-email message verbatim when registration fails with DUPLICATE_EMAIL', () => {
+  it('shows the duplicate-profile banner and per-field messages when both email and phone are duplicated', () => {
     mockedUseWorkerRegistration.mockReturnValue(
       createMutation({
         isError: true,
-        error: { code: 'DUPLICATE_EMAIL', message: 'A worker with this email is already registered.', field: 'email' },
+        error: {
+          code: 'DUPLICATE_EMAIL_AND_PHONE',
+          message:
+            'A profile with this Email or Phone Number already exists. Update the highlighted fields and try again.',
+          field: 'email',
+          fieldErrors: {
+            email: 'A profile with this Email already exists.',
+            phone: 'A profile with this Phone Number already exists.',
+          },
+        },
       }),
     )
 
-    render(<WorkerRegistrationPage />)
+    renderPage()
 
-    expect(screen.getByRole('alert')).toHaveTextContent('A worker with this email is already registered.')
+    const banner = screen.getByText(/we couldn't submit your profile/i).closest('[role="alert"]')
+    expect(banner).toHaveTextContent(
+      /a profile with this email or phone number already exists/i,
+    )
+    expect(screen.getByText('A profile with this Email already exists.')).toBeInTheDocument()
+    expect(screen.getByText('A profile with this Phone Number already exists.')).toBeInTheDocument()
   })
 
-  it('shows a generic error message for non-duplicate-email failures', () => {
+  it('shows a generic error banner for non-duplicate failures', () => {
     mockedUseWorkerRegistration.mockReturnValue(
       createMutation({
         isError: true,
@@ -80,23 +103,9 @@ describe('WorkerRegistrationPage', () => {
       }),
     )
 
-    render(<WorkerRegistrationPage />)
+    renderPage()
 
     expect(screen.getByRole('alert')).toHaveTextContent('Registration failed. Please try again.')
-  })
-
-  it('calls reset when the retry button is clicked', async () => {
-    const user = userEvent.setup()
-    const mutation = createMutation({
-      isError: true,
-      error: { code: 'UNKNOWN', message: 'boom' },
-    })
-    mockedUseWorkerRegistration.mockReturnValue(mutation)
-
-    render(<WorkerRegistrationPage />)
-    await user.click(screen.getByRole('button', { name: /retry/i }))
-
-    expect(mutation.reset).toHaveBeenCalledTimes(1)
   })
 
   it('calls mutate with the submitted form values', async () => {
@@ -104,26 +113,34 @@ describe('WorkerRegistrationPage', () => {
     const mutation = createMutation()
     mockedUseWorkerRegistration.mockReturnValue(mutation)
 
-    render(<WorkerRegistrationPage />)
-    await user.type(screen.getByLabelText(/name/i), 'Jane Doe')
-    await user.type(screen.getByLabelText(/email/i), 'jane@example.com')
-    await user.type(screen.getByLabelText(/phone/i), '9876543210')
-    await user.selectOptions(screen.getByLabelText(/location/i), 'downtown')
+    renderPage()
+    await user.type(screen.getByLabelText(/full name/i), 'Jane Doe')
+    await user.type(screen.getByLabelText(/email id/i), 'jane@example.com')
+    await user.type(screen.getByLabelText(/phone number/i), '9876543210')
+    await user.type(screen.getByLabelText(/^location/i), 'New York')
     await user.type(screen.getByLabelText(/age/i), '25')
-    await user.click(screen.getByLabelText(/cleaning/i))
-    await user.click(screen.getByRole('button', { name: /register/i }))
+    await user.click(screen.getByLabelText('Plumbing'))
+    await user.click(screen.getByRole('button', { name: /submit profile/i }))
 
     expect(mutation.mutate).toHaveBeenCalledTimes(1)
     expect(mutation.mutate).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'Jane Doe', email: 'jane@example.com' }),
+      expect.objectContaining({ name: 'Jane Doe', email: 'jane@example.com', location: 'New York' }),
     )
   })
 
   it('disables the submit button while a submission is pending', () => {
     mockedUseWorkerRegistration.mockReturnValue(createMutation({ isPending: true }))
 
-    render(<WorkerRegistrationPage />)
+    renderPage()
 
-    expect(screen.getByRole('button', { name: /register/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /submit profile/i })).toBeDisabled()
+  })
+
+  it('renders a link back to role selection', () => {
+    mockedUseWorkerRegistration.mockReturnValue(createMutation())
+
+    renderPage()
+
+    expect(screen.getByRole('link', { name: /back to role selection/i })).toHaveAttribute('href', '/')
   })
 })

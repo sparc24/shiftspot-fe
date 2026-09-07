@@ -9,6 +9,11 @@ const WorkerRegistrationPage = lazy(() =>
     default: module.WorkerRegistrationPage,
   })),
 )
+const JobSeekerSearchPage = lazy(() =>
+  import('@/features/job-seeker').then((module) => ({
+    default: module.JobSeekerSearchPage,
+  })),
+)
 
 function PageLoader() {
   return (
@@ -24,6 +29,7 @@ export function Router() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/worker/register" element={<WorkerRegistrationPage />} />
+        <Route path="/seeker/search" element={<JobSeekerSearchPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

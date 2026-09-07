@@ -8,7 +8,9 @@ describe('App', () => {
   it('renders the landing page at the root route', async () => {
     render(<App />)
 
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('ShiftSpot Job Portal')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
+      'Find local skilled workers. Get hired directly.',
+    )
   })
 
   it('navigates to the worker registration page when the CTA is clicked', async () => {
@@ -17,6 +19,6 @@ describe('App', () => {
 
     await user.click(await screen.findByRole('button', { name: /act as a worker/i }))
 
-    expect(await screen.findByRole('heading', { name: /worker registration/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /list your skills/i })).toBeInTheDocument()
   })
 })

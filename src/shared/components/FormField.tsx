@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 interface FormFieldProps {
   id: string
-  label: string
+  label: ReactNode
   error?: string
   required?: boolean
   hint?: string
@@ -16,7 +16,7 @@ interface FormFieldProps {
 export function FormField({ id, label, error, required = false, hint, children }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-1">
-      <label id={`${id}-label`} htmlFor={id} className="text-sm font-medium text-gray-700">
+      <label id={`${id}-label`} htmlFor={id} className="text-sm font-semibold text-gray-800">
         {label}
         {required ? (
           <span aria-hidden="true" className="text-red-600">
@@ -25,7 +25,7 @@ export function FormField({ id, label, error, required = false, hint, children }
           </span>
         ) : null}
       </label>
-      {hint ? (
+      {hint && !error ? (
         <p id={`${id}-hint`} className="text-xs text-gray-500">
           {hint}
         </p>

@@ -1,0 +1,1 @@
+export { JobSeekerSearchPage } from './JobSeekerSearchPage'

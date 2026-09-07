@@ -1,21 +1,32 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 
-import { Button, FormField, MultiSelect, SelectInput, TextInput } from '@/shared/components'
+import { Button, FormField, MultiSelect, TextInput } from '@/shared/components'
+import type { DuplicateField } from '@/shared/types'
 import { workerRegistrationSchema, type WorkerRegistrationFormValues } from '@/shared/validation'
 
-import { LOCATION_OPTIONS, SKILL_OPTIONS } from './constants'
+import { SKILL_OPTIONS } from './constants'
 
 interface WorkerRegistrationFormProps {
   onSubmit: (values: WorkerRegistrationFormValues) => void
   isSubmitting: boolean
+  /** Duplicate-field messages returned by the API for the most recent submission, if any. */
+  serverFieldErrors?: Partial<Record<DuplicateField, string>>
 }
 
-export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistrationFormProps) {
+export function WorkerRegistrationForm({
+  onSubmit,
+  isSubmitting,
+  serverFieldErrors,
+}: WorkerRegistrationFormProps) {
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors },
   } = useForm<WorkerRegistrationFormValues>({
     resolver: zodResolver(workerRegistrationSchema),
@@ -30,11 +41,25 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
     },
   })
 
+  // Duplicate-email/phone errors are discovered only after the mock API
+  // responds, so they arrive as a prop rather than through the resolver —
+  // apply each one to its own field, in addition to the top-level banner the
+  // page renders.
+  useEffect(() => {
+    if (!serverFieldErrors) return
+    for (const [fieldName, message] of Object.entries(serverFieldErrors) as Array<
+      [DuplicateField, string]
+    >) {
+      setError(fieldName, { type: 'server', message })
+    }
+  }, [serverFieldErrors, setError])
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-      <FormField id="name" label="Name" required error={errors.name?.message}>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
+      <FormField id="name" label="Full name" required error={errors.name?.message}>
         <TextInput
           id="name"
+          placeholder="e.g. John Doe"
           invalid={!!errors.name}
           aria-required="true"
           aria-describedby={errors.name ? 'name-error' : undefined}
@@ -42,21 +67,29 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
         />
       </FormField>
 
-      <FormField id="email" label="Email" required error={errors.email?.message}>
+      <FormField
+        id="email"
+        label="Email ID"
+        required
+        error={errors.email?.message}
+        hint="Used by job seekers to contact you — must be unique on ShiftSpot."
+      >
         <TextInput
           id="email"
           type="email"
+          placeholder="e.g. john@example.com"
           invalid={!!errors.email}
           aria-required="true"
-          aria-describedby={errors.email ? 'email-error' : undefined}
+          aria-describedby={errors.email ? 'email-error' : 'email-hint'}
           {...register('email')}
         />
       </FormField>
 
-      <FormField id="phone" label="Phone" required error={errors.phone?.message}>
+      <FormField id="phone" label="Phone number" required error={errors.phone?.message}>
         <TextInput
           id="phone"
           type="tel"
+          placeholder="10-digit mobile number"
           invalid={!!errors.phone}
           aria-required="true"
           aria-describedby={errors.phone ? 'phone-error' : undefined}
@@ -65,10 +98,9 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
       </FormField>
 
       <FormField id="location" label="Location" required error={errors.location?.message}>
-        <SelectInput
+        <TextInput
           id="location"
-          placeholder="Select a location"
-          options={LOCATION_OPTIONS}
+          placeholder="e.g. New York"
           invalid={!!errors.location}
           aria-required="true"
           aria-describedby={errors.location ? 'location-error' : undefined}
@@ -80,6 +112,7 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
         <TextInput
           id="age"
           type="number"
+          placeholder="e.g. 30"
           invalid={!!errors.age}
           aria-required="true"
           aria-describedby={errors.age ? 'age-error' : undefined}
@@ -91,7 +124,20 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
         name="skills"
         control={control}
         render={({ field }) => (
-          <FormField id="skills" label="Skills" required error={errors.skills?.message}>
+          <FormField
+            id="skills"
+            label={
+              <>
+                Skills
+                <span aria-hidden="true" className="text-red-600">
+                  {' '}
+                  *
+                </span>{' '}
+                — select at least one
+              </>
+            }
+            error={errors.skills?.message}
+          >
             <MultiSelect
               id="skills"
               name="skills"
@@ -105,9 +151,18 @@ export function WorkerRegistrationForm({ onSubmit, isSubmitting }: WorkerRegistr
         )}
       />
 
-      <Button type="submit" isLoading={isSubmitting} className="mt-2 self-start">
-        Register
-      </Button>
+      <div className="mt-2 flex items-center gap-6">
+        <Button type="submit" variant="dark" isLoading={isSubmitting}>
+          Submit Profile
+        </Button>
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="text-sm font-medium text-gray-600 hover:text-gray-900 hover:underline"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   )
 }

@@ -33,21 +33,31 @@ export function MultiSelect({ id, name, options, value, onChange, invalid = fals
       aria-describedby={describedById}
       className={`rounded-md border p-3 ${invalid ? 'border-red-500' : 'border-gray-300'}`}
     >
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {options.map((option) => {
           const optionId = `${name}-${option.value}`
+          const checked = value.includes(option.value)
           return (
-            <div key={option.value} className="flex items-center gap-2">
+            <div
+              key={option.value}
+              className={`relative flex items-center gap-2 rounded-md border p-3 transition-colors ${
+                checked ? 'border-slate-800 bg-blue-50' : 'border-gray-300 bg-white'
+              }`}
+            >
+              <span
+                aria-hidden="true"
+                className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border border-gray-300 bg-gray-100"
+              />
               <input
                 id={optionId}
                 type="checkbox"
                 name={name}
                 value={option.value}
-                checked={value.includes(option.value)}
+                checked={checked}
                 onChange={(event) => handleToggle(option.value, event.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
               />
-              <label htmlFor={optionId} className="text-sm text-gray-700">
+              <label htmlFor={optionId} className="text-sm font-semibold text-gray-800">
                 {option.label}
               </label>
             </div>

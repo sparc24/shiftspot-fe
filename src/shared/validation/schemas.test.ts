@@ -6,9 +6,9 @@ const validPayload = {
   name: 'Jane Doe',
   email: 'Jane.Doe@Example.com',
   phone: '9876543210',
-  location: 'downtown',
+  location: 'New York',
   age: 25,
-  skills: ['cleaning'],
+  skills: ['plumbing'],
 }
 
 describe('workerRegistrationSchema', () => {
@@ -105,8 +105,13 @@ describe('workerRegistrationSchema', () => {
     expect(result.success).toBe(false)
   })
 
-  it('rejects multiple valid skills collapsed to duplicates only if none are valid', () => {
-    const result = workerRegistrationSchema.safeParse({ ...validPayload, skills: ['cleaning', 'delivery'] })
+  it('accepts multiple valid skills', () => {
+    const result = workerRegistrationSchema.safeParse({ ...validPayload, skills: ['plumbing', 'electrical'] })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts free-text location (not constrained to a fixed list)', () => {
+    const result = workerRegistrationSchema.safeParse({ ...validPayload, location: 'Some Small Town' })
     expect(result.success).toBe(true)
   })
 })
