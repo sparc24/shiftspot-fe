@@ -1,0 +1,3 @@
+{
+  "$comment": "Atlassian (Jira + Confluence) is provided by the claude.ai Atlassian connector, NOT by a locally-spawned MCP server. Connect it in Claude Code > Settings > Connectors. Every Jira/Confluence tool referenced in this bundle uses the connector's tool prefix (mcp__claude_ai_Atlassian__*), so do not add an mcpServers stanza here: MCP servers are not configured from settings.json (they belong in a project-root .mcp.json), and a locally-registered server named 'atlassian' would expose mcp__atlassian__* tool names that none of this bundle's skills call."
+}

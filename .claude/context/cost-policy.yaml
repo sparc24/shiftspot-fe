@@ -1,0 +1,56 @@
+# Cost Policy — CostTier -> per-agent model map, plus pricing for spend tracking
+#
+# v1 (model assignment) + v2 (measurement): assigns a model per agent role, and
+# prices actual measured token usage (see CLAUDE.md's Resumable Pipeline State
+# "spend" block). Still NO budget circuit breaker - that's deferred until real
+# spend numbers exist to calibrate budgets against.
+#
+# Owned by whoever deploys this bundle on a given project - retune the model
+# choices and pricing below per project without touching
+# .claude/skills/cost-governor/SKILL.md, which stays identical across every
+# project sharing this bundle.
+#
+# IMPORTANT: this file assigns MODELS ONLY. It never decides whether an agent runs.
+# Which agents run is decided solely by workflowType (Step 1: full | bypass).
+# Never put `skip` in these tables — a Full Workflow task can resolve to any tier,
+# including `trivial`, and `planning: skip` there would violate Orchestrator Rule 1
+# ("Never skip Planning in Full Workflow").
+
+# USD per 1M tokens, blended (not split input/output). A single blended rate is
+# deliberate: the subagent_tokens figure the Agent tool returns is one combined
+# number, not split into input/output — split pricing would imply a precision
+# the underlying data doesn't have. Update these if your account's actual rates
+# differ; they are illustrative, not authoritative.
+pricing:
+  haiku:  { blended_per_million: 3.00 }
+  sonnet: { blended_per_million: 9.00 }
+  opus:   { blended_per_million: 45.00 }
+
+tiers:
+  trivial:
+    knowledge: haiku
+    planning: haiku
+    coding: haiku
+    code_review: haiku
+    unittest: haiku
+    performance_review: haiku
+
+  standard:
+    knowledge: haiku
+    planning: sonnet
+    coding: sonnet
+    code_review: sonnet
+    unittest: haiku
+    performance_review: haiku
+
+  critical:
+    knowledge: sonnet
+    planning: opus
+    coding: sonnet
+    code_review: opus
+    unittest: sonnet
+    performance_review: sonnet
+
+# The Knowledge Agent runs BEFORE Step 2 resolves CostTier, so its model cannot
+# come from a resolved tier. This is the model it always runs on.
+knowledge_default: haiku
