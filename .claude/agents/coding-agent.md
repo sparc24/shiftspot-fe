@@ -213,6 +213,19 @@ export const orderService = {
 };
 ```
 
+### Secrets and Environment Configuration Rules
+
+**Never hardcode confidential data or environment-specific endpoints in source.** This covers API base URLs, API keys/tokens, client secrets, webhook URLs, and any other value that differs between environments or must not be publicly visible in the repo.
+
+- Read every such value from `import.meta.env.VITE_<NAME>` — never inline a literal URL/key/token in a component, hook, service, or config file.
+- If the needed variable doesn't exist yet:
+  1. Add it to the project's `.env` file (create `.env` at the repo root if it doesn't exist yet — never write the real value into `.env.example`/`.env.sample`, only a placeholder there).
+  2. Add/update `.env.example` with the same key and a placeholder value (e.g. `VITE_API_BASE_URL=https://api.example.com`), so the shape of required configuration is documented and reviewable without exposing the real value.
+  3. Reference it in code as `import.meta.env.VITE_<NAME>`, exactly like the existing `src/shared/api/client.ts` pattern (`import.meta.env.VITE_API_BASE_URL`).
+- `.env` is gitignored (`.gitignore`) — it must never be committed, and never be a file the GitHub PR Skill's Confidential Data Check (see `CLAUDE.md` Rule 25) has to catch. `.env.example`/`.env.sample` are the only tracked variants, and only ever contain placeholders.
+- Vite only exposes `VITE_`-prefixed variables to client code (anything without that prefix is invisible to `import.meta.env` by design) — never work around this by renaming a genuinely server-side secret to fit the prefix just to reach it from the browser. If a value must never reach the client bundle at all (a true server-side secret), that's a backend/service concern, not something this frontend Coding Agent introduces client-side.
+- This applies equally to the mocked service layer (e.g. `mockWorkerApi.ts`-style stand-ins) — a mock's *feature flag* (`VITE_USE_MOCK_API`) still follows this same `.env`-first pattern, not a hardcoded boolean.
+
 ### Form Rules
 
 All forms use React Hook Form + Zod. No manual form state.

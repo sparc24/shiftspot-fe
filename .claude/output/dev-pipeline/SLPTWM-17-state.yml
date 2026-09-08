@@ -1,0 +1,96 @@
+ticketId: "SLPTWM-17"
+workflowType: "full"
+currentStep: "pr-opened"
+completedSteps:
+  - parent-branch-selection
+  - task-classification
+  - knowledge-agent
+  - task-signals
+  - planning-agent
+  - plan-approval
+  - coding-agent
+  - block-a
+  - block-b
+  - rebase-health
+  - jira-comment
+  - pr-opened
+parentBranch: "develop"
+branchName: "feature/SLPTWM-17-worker-profile-registration"
+diverged: false
+
+issueType: "Story"
+storyPoints: null
+
+depth: "High"
+costTier: "critical"
+modelAssignment:
+  knowledge: sonnet
+  planning: opus
+  coding: sonnet
+  code_review: opus
+  unittest: sonnet
+  performance_review: sonnet
+
+spend:
+  knowledge:           { tokens: 66332, usd: 0.20 }
+  planning:            { tokens: 148654, usd: 2.23 }
+  coding:              { tokens: 358012, usd: 2.15 }
+  code_review:         { tokens: 187367, usd: 2.81 }
+  unittest:            { tokens: 129080, usd: 0.77 }
+  performance_review:  { tokens: 74329, usd: 0.45 }
+  totalTokens: 963774
+  totalUsd: 8.61
+
+planApproved: true
+planPath: ".claude/output/dev-pipeline/SLPTWM-17-plan.md"
+planTitle: "Worker Profile Registration - Happy Path"
+planChecksum: { create: 39, modify: 5, delete: 3 }
+planConfluenceUrl: ""
+planConfluenceTitle: ""
+
+changedFiles: []
+completedScopeItems:
+  - "dependencies-install"
+  - "config-strict-tailwind-vitest"
+  - "shared-types-and-schema"
+  - "service-layer"
+  - "registration-hook"
+  - "shared-components"
+  - "worker-registration-feature"
+  - "landing-feature"
+  - "app-shell-and-routing"
+  - "unit-tests"
+  - "a11y-rework-skills-field-required-state"
+  - "design-alignment-rework-landing-and-registration"
+  - "design-alignment-rework-penpot-v2-arvo-navy-amber"
+
+testPlan: |
+  - Zod schema: valid payload + lowercasing; name min/max boundaries; email format; phone regex; location free-text required; age int/min(18)/max(70) boundaries; skills (plumbing/electrical/gardening/carpentry/painting/cleaning) required/unknown-id rejection; whitespace trimming.
+  - workerService/mockWorkerApi: successful creation with id/createdAt; independent duplicate-email and duplicate-phone rejection, plus both-at-once; distinct emails succeed independently.
+  - useWorkerRegistration: success transition exposing created worker via TanStack Query mutation.
+  - WorkerRegistrationForm: empty-submit validation errors; valid submission payload shape; Skills fieldset labelling/aria-describedby; aria-required on all mandatory fields; focus moves to first invalid field; full tab-order keyboard navigation; error clears on correction; server-reported duplicate field errors applied via setError; Cancel navigation.
+  - WorkerRegistrationPage: default render; duplicate-error banner + per-field highlighting for email/phone; success message with worker name; submit disabled while pending.
+  - Shared components: Button, TextInput, SelectInput, FormField, ErrorAlert, SuccessMessage, MultiSelect, ErrorBoundary - rendering, interaction, accessibility, error states.
+  - LandingPage/Router/App: both CTAs (Worker solid, Job Seeker outline) render+navigate to /worker/register and /seeker/search; route matching for /, /worker/register, /seeker/search, plus catch-all; full-app smoke test through ErrorBoundary -> Router -> lazy pages.
+  - JobSeekerSearchPage: placeholder renders, link back to landing.
+prSummary: |
+  Implements SLPTWM-17: a worker self-registration flow for the ShiftSpot job portal, rebuilt to match the actual
+  approved design screenshots (Landing Page with both role cards, Worker Registration with sidebar + exact copy).
+  Adds a landing page with "Act as a Worker" / "Act as a Job Seeker" CTAs, a client-side-validated (Zod + React Hook
+  Form) registration form capturing name/email/phone/location/age/skills (plumbing/electrical/gardening/carpentry/
+  painting/cleaning), a mock in-memory worker API/service layer (single swap point for a future live endpoint) with
+  independent email and phone duplicate detection, a TanStack Query mutation hook wiring the form to that service,
+  and a shared component library built with accessibility as a first-class concern. Routing is set up via React
+  Router with lazy-loaded pages (including a /seeker/search placeholder), wrapped in an app-level ErrorBoundary.
+  90 tests pass with 100% statement/branch/function/line coverage on every changed file.
+prUrl: "https://github.com/sparc24/shiftspot-fe/pull/1"
+
+mcpStatus:
+  atlassian: "connected"
+  figma: "skipped"
+  github: "connected"
+startedAt: "2026-09-07T00:00:00Z"
+lastWriter:
+  client: "cli"
+  sessionId: "shiftspot-fe-13"
+  at: "2026-09-08T00:00:00Z"
