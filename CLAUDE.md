@@ -109,19 +109,25 @@ Step 1 — Fetch Jira ticket (issueType, storyPoints), then Classify
      │ NO
      ▼
 [Notify: Started] Agent: Knowledge Agent [Notify: Completed]
-                   ↓
+                   ↓ [Spend: read subagent_tokens from THIS result now, before
+                        moving on — write spend.knowledge to the state file
+                        per Rule 22/24. Not a later cleanup step.]
 Step 2 — Assess Task Signals (Depth + CostTier)
                    ↓
 [Notify: Started] Agent: Planning Agent (depth-scaled LLD, CostTier model)
                    → returns LLD, terminates → Orchestrator presents it, collects
                      Approved/feedback → re-invoke as a fresh call per revision
                      round [Notify: Completed]
+                   ↓ [Spend: add THIS invocation's subagent_tokens into
+                        spend.planning now — every draft/revise/finalize call,
+                        summed, not just the last one]
                    ↓          (persists plan + planApproved to state file)
 [Notify: Started] Agent: Coding Agent (Gate 3: Git Branch Skill — branches off
                    ParentBranch; Diverged? → reports + terminates, Orchestrator
                    resolves with user, re-invokes; owns [Jira Status: In Progress];
                    commits incrementally as work progresses) [Notify: Completed]
-                   ↓
+                   ↓ [Spend: add THIS invocation's subagent_tokens into
+                        spend.coding now — before Block A starts]
      ┌────────────────────────────────────────────────┐
      │ Step 3a — PARALLEL BLOCK A (one message)        │
      │ [Notify: Started] Bash: npx tsc --noEmit        │
@@ -129,8 +135,13 @@ Step 2 — Assess Task Signals (Depth + CostTier)
      └─────────────────────┬────────────────────────────┘
                             ↓ Orchestrator merges: any tsc error → Critical
                               [Notify: Completed/Blocked]
+                            ↓ [Spend: add THIS invocation's subagent_tokens
+                                 into spend.code_review now, whether the
+                                 verdict is Go or No-Go]
             ↓ (No-Go: re-run only the failing half,     ↓ (Go)
-               max 2 cycles → escalate)                  │
+               max 2 cycles → escalate — each re-run     │
+               ADDS to spend.coding/spend.code_review,   │
+               it does not replace the prior figure)     │
         Coding Agent                                     │
                                                           ▼
      ┌────────────────────────────────────────────────┐
@@ -141,6 +152,10 @@ Step 2 — Assess Task Signals (Depth + CostTier)
      │ Agent: Performance Review Agent (depth-gated)   │
      └─────────────────────┬────────────────────────────┘
                             ↓ [Notify: Completed/Blocked]
+                            ↓ [Spend: add both this invocation's
+                                 subagent_tokens — spend.unittest AND
+                                 spend.performance_review — now, even though
+                                 both were issued in one message]
                    Step 4 — Rebase Health
                    [Notify: Started] sync with ParentBranch,
                    auto-resolve safe conflicts,
@@ -380,10 +395,11 @@ Task classified as Bypass
 Coding Agent (Gate 1 satisfied by `workflowType: bypass` instead of an approved LLD;
               Gate 3 still applies — branches off ParentBranch, commits incrementally;
               CostTier is always trivial in Bypass — cheapest available model)
-     │
+     │ [Spend: add THIS invocation's subagent_tokens into spend.coding now —
+     │    Bypass still measures spend, per Rule 22; it isn't Full-Workflow-only]
      ▼
 Unit Test Agent (scoped test run, safety net — still required, never skipped)
-     │
+     │ [Spend: add THIS invocation's subagent_tokens into spend.unittest now]
      ▼
 Step 4 — Rebase Health (still runs — never skipped, even in Bypass)
      │
@@ -552,6 +568,8 @@ Every sub-step writes to the state file as it completes — the Jira Comment Ski
 4. **On `Status: Created`** → record `prUrl`, add `pr-opened` to `completedSteps`, and report the URL in the conversation. **Keep the state file** — per Step 0's Retention rule, it is never deleted automatically, success or failure alike, since the ticket can still need further work (review feedback, a design-alignment fix) before it merges, and that work must keep accumulating into this same file's `spend.*`.
 
    **On `Status: Failed`** → **keep the state file** (same treatment as success, just without `pr-opened` recorded yet), set `currentStep: rebase-health`, and report the failure plus the manual fallback command (`gh pr create --base <parentBranch> --head <branchName> ...`). `gh` auth failure is a documented degradation path (the MCP Health Check lets the GitHub CLI degrade gracefully "until the PR step actually needs it"), so this is a realistic outcome, not a corner case.
+
+**Pre-PR spend sanity check (mandatory, immediately before Step 3 of this handoff).** Re-read the state file's `spend` block and cross-check it against `completedSteps`: for every role whose step actually ran (`knowledge-agent` completed → `spend.knowledge` must be non-null; `planning-agent` → `spend.planning`; `coding-agent` or `block-a`'s rework loop → `spend.coding`; `block-a` → `spend.code_review` in Full Workflow; `block-b` → `spend.unittest`, and `spend.performance_review` in Full Workflow), confirm `tokens`/`usd` are populated, not left at their initial `null`. This check exists because Rule 22 has been silently skipped in practice — three consecutive tasks shipped a PR with every `spend.<role>` field still `null` despite every one of those agent invocations returning real `subagent_tokens` in its result. If any ran-but-unrecorded gap is found here, backfill it now from the conversation's own Agent-tool results before opening the PR — do not open the PR first and fix spend later, since that's exactly the pattern that let the gap ship three times in a row.
 
 ---
 

@@ -27,14 +27,14 @@ modelAssignment:
   performance_review: haiku
 
 spend:
-  knowledge:           { tokens: null, usd: null }
-  planning:            { tokens: null, usd: null }
-  coding:              { tokens: null, usd: null }
-  code_review:         { tokens: null, usd: null }
-  unittest:            { tokens: null, usd: null }
-  performance_review:  { tokens: null, usd: null }
-  totalTokens: 0
-  totalUsd: 0.00
+  knowledge:           { tokens: null, usd: null }   # not run - Bypass Workflow skips Knowledge Agent
+  planning:            { tokens: null, usd: null }   # not run - Bypass Workflow skips Planning Agent
+  coding:              { tokens: 53285, usd: 0.16 }
+  code_review:         { tokens: null, usd: null }   # not run - Bypass Workflow skips Code Review Agent
+  unittest:            { tokens: 75985, usd: 0.23 }
+  performance_review:  { tokens: null, usd: null }   # not run - Bypass Workflow skips Performance Review Agent
+  totalTokens: 129270
+  totalUsd: 0.39
 
 planApproved: false
 planPath: ""
