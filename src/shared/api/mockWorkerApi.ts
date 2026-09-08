@@ -1,9 +1,126 @@
-import type { ApiError, DuplicateField, Worker, WorkerRegistrationPayload } from '@/shared/types'
+import type {
+  ApiError,
+  DuplicateField,
+  Worker,
+  WorkerRegistrationPayload,
+  WorkerSearchFilters,
+} from '@/shared/types'
 
 const MOCK_LATENCY_MS = 600
 
 const workersByEmail = new Map<string, Worker>()
 const workersByPhone = new Map<string, Worker>()
+
+// Seed data so AC1/AC2/AC3 are demonstrable without first registering
+// workers. `@seed.shiftspot.test` addresses/phones are reserved for this
+// purpose and never collide with a real registration attempt (Q3). Varied
+// skills/locations/ages so some searches return multiple results and some
+// return zero.
+function seedWorker(payload: WorkerRegistrationPayload, id: string, createdAt: string): Worker {
+  const worker: Worker = { ...payload, id, createdAt }
+  workersByEmail.set(payload.email, worker)
+  workersByPhone.set(payload.phone, worker)
+  return worker
+}
+
+const workerList: Worker[] = [
+  seedWorker(
+    {
+      name: 'Anita Kumar',
+      email: 'anita.kumar@seed.shiftspot.test',
+      phone: '+91-900-000-0001',
+      location: 'Cochin, Kerala',
+      age: 29,
+      skills: ['plumbing', 'electrical'],
+    },
+    'seed-0001',
+    '2026-01-01T00:00:00.000Z',
+  ),
+  seedWorker(
+    {
+      name: 'Ben Mathew',
+      email: 'ben.mathew@seed.shiftspot.test',
+      phone: '+91-900-000-0002',
+      location: 'Cochin, Kerala',
+      age: 34,
+      skills: ['carpentry', 'painting'],
+    },
+    'seed-0002',
+    '2026-01-01T00:00:01.000Z',
+  ),
+  seedWorker(
+    {
+      name: 'Divya Nair',
+      email: 'divya.nair@seed.shiftspot.test',
+      phone: '+91-900-000-0003',
+      location: 'Ernakulam, Kerala',
+      age: 22,
+      skills: ['cleaning'],
+    },
+    'seed-0003',
+    '2026-01-01T00:00:02.000Z',
+  ),
+  seedWorker(
+    {
+      name: 'Faisal Rahman',
+      email: 'faisal.rahman@seed.shiftspot.test',
+      phone: '+91-900-000-0004',
+      location: 'Kochi, Kerala',
+      age: 41,
+      skills: ['electrical', 'gardening'],
+    },
+    'seed-0004',
+    '2026-01-01T00:00:03.000Z',
+  ),
+  seedWorker(
+    {
+      name: 'Geetha Pillai',
+      email: 'geetha.pillai@seed.shiftspot.test',
+      phone: '+91-900-000-0005',
+      location: 'Thrissur, Kerala',
+      age: 55,
+      skills: ['gardening', 'cleaning'],
+    },
+    'seed-0005',
+    '2026-01-01T00:00:04.000Z',
+  ),
+  seedWorker(
+    {
+      name: 'Hari Menon',
+      email: 'hari.menon@seed.shiftspot.test',
+      phone: '+91-900-000-0006',
+      location: 'Kottayam, Kerala',
+      age: 29,
+      skills: ['plumbing', 'carpentry', 'painting'],
+    },
+    'seed-0006',
+    '2026-01-01T00:00:05.000Z',
+  ),
+  seedWorker(
+    {
+      name: 'Irene Thomas',
+      email: 'irene.thomas@seed.shiftspot.test',
+      phone: '+91-900-000-0007',
+      location: 'Alappuzha, Kerala',
+      age: 63,
+      skills: ['painting'],
+    },
+    'seed-0007',
+    '2026-01-01T00:00:06.000Z',
+  ),
+  seedWorker(
+    {
+      name: 'Jibin Varghese',
+      email: 'jibin.varghese@seed.shiftspot.test',
+      phone: '+91-900-000-0008',
+      location: 'Kozhikode, Kerala',
+      age: 18,
+      skills: ['electrical'],
+    },
+    'seed-0008',
+    '2026-01-01T00:00:07.000Z',
+  ),
+]
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -58,10 +175,35 @@ async function createWorker(payload: WorkerRegistrationPayload): Promise<Worker>
 
   workersByEmail.set(payload.email, worker)
   workersByPhone.set(payload.phone, worker)
+  workerList.push(worker)
 
   return worker
 }
 
+// Match semantics (see plan §6.2): AND across skills/location/age dimensions,
+// OR within the selected skills. An entirely empty filter object matches
+// every worker (browse-all).
+function matchesFilters(worker: Worker, filters: WorkerSearchFilters): boolean {
+  const skillMatch =
+    filters.skills.length === 0 || filters.skills.some((skill) => worker.skills.includes(skill))
+
+  const locationMatch =
+    !filters.location ||
+    worker.location.trim().toLowerCase().includes(filters.location.trim().toLowerCase())
+
+  const ageMatch = filters.age === undefined || worker.age === filters.age
+
+  return skillMatch && locationMatch && ageMatch
+}
+
+// Always resolves — never rejects — so the search error branch is exercised
+// only once a real endpoint exists.
+async function searchWorkers(filters: WorkerSearchFilters): Promise<Worker[]> {
+  await delay(MOCK_LATENCY_MS)
+  return workerList.filter((worker) => matchesFilters(worker, filters))
+}
+
 export const mockWorkerApi = {
   createWorker,
+  searchWorkers,
 }

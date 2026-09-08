@@ -86,4 +86,25 @@ describe('MultiSelect', () => {
     expect(group).toHaveAttribute('aria-describedby', 'skills-error')
     expect(group).toHaveAttribute('aria-invalid', 'true')
   })
+
+  it('sets aria-required to false when required is explicitly false', () => {
+    render(
+      <MultiSelect
+        id="skills"
+        name="skills"
+        options={options}
+        value={[]}
+        onChange={vi.fn()}
+        required={false}
+      />,
+    )
+
+    expect(screen.getByRole('group')).toHaveAttribute('aria-required', 'false')
+  })
+
+  it('defaults aria-required to true when required is omitted, preserving worker-registration behaviour', () => {
+    render(<MultiSelect id="skills" name="skills" options={options} value={[]} onChange={vi.fn()} />)
+
+    expect(screen.getByRole('group')).toHaveAttribute('aria-required', 'true')
+  })
 })
