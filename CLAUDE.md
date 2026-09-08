@@ -226,6 +226,13 @@ diverged: false                       # from Git Branch Skill — re-checked at 
 # From Step 1a (Jira fetch) — nothing downstream re-fetches the ticket
 issueType: "Story"                    # null if no ticket
 storyPoints: 5                        # null if unset on the ticket
+feSubtasks:                           # FE/UI-scoped subtasks (empty list if none, or the ticket itself
+                                       # if it is already an FE/UI subtask with no children) — passed to
+                                       # Knowledge Agent and Planning Agent alongside the parent story
+  - key: "SLPTWM-118"
+    summary: "[FE] Worker Profile Creation Form Logic and Validation"
+    status: "To Do"
+    description: "..."
 
 # From Step 2
 depth: "Medium"                       # Low | Medium | High — null in bypass
@@ -323,7 +330,19 @@ Call `mcp__claude_ai_Atlassian__getJiraIssue` with the ticket key and record the
 
 If there is no Jira ticket (plain-text task), set `issueType: null` and `storyPoints: null` and classify from the description text alone. If the fetch itself fails, that is Atlassian's hard block per the MCP Health Check Skill — stop; do not proceed with guessed values.
 
-**Nothing downstream re-fetches the ticket.** `issueType` and `storyPoints` live in the state file from here on, which is also what makes them available after a resume.
+**Also check subtasks for FE/UI scope.** If the fetched ticket has a `subtasks` field (i.e. it is a Story/Epic with children, not a subtask itself), inspect each subtask's summary and labels for FE/UI ownership — a `[FE]`/`[UI]`/`[Frontend]` summary prefix, or a `frontend`/`ui`/`ux` label. For every match, call `getJiraIssue` on that subtask to pull its `summary`, `description`, and acceptance criteria, and record the list as `feSubtasks` in the state file:
+
+```yaml
+feSubtasks:
+  - key: "SLPTWM-118"
+    summary: "[FE] Worker Profile Creation Form Logic and Validation"
+    status: "To Do"
+    description: "..."   # full description/AC text, used as planning input
+```
+
+This pipeline builds against **`feSubtasks`' acceptance criteria, not just the parent story's** — the parent's ACs describe the end-to-end feature (often spanning BE/UI/QA subtasks too), while the FE subtask(s) scope exactly what this pipeline is responsible for implementing. Pass `feSubtasks` to the Knowledge Agent (to ground its scope/signal output) and to the Planning Agent (to shape Section 2 Scope of Change and Section 4 Component Specifications) alongside the parent story. If the ticket being worked **is itself** an FE/UI subtask (no children), skip this lookup — `feSubtasks` is just `[the ticket itself]`. If no subtask matches FE/UI criteria, set `feSubtasks: []` and proceed on the parent story's ACs alone, same as before.
+
+**Nothing downstream re-fetches the ticket.** `issueType`, `storyPoints`, and `feSubtasks` live in the state file from here on, which is also what makes them available after a resume.
 
 ### 1b — Classify the task
 

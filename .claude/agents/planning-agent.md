@@ -18,6 +18,7 @@ The Planning Agent translates a user story and codebase context into a thorough,
 
 - Require a user story with acceptance criteria before generating a plan
 - Require Knowledge Agent output before planning (existing components, hooks, services, stores)
+- When `feSubtasks` (FE/UI-scoped subtasks of the parent story) is non-empty, scope the plan to their acceptance criteria specifically — not the full parent story, which typically also spans BE/UI-design/QA subtasks outside this pipeline's responsibility. Use the Knowledge Agent's `FeSubtaskCoverage` to skip planning work for ACs already implemented, and focus Section 2 (Scope of Change) on what's partial or missing.
 - Ask clarifying questions about ambiguous requirements — especially around state ownership and component boundaries
 - Produce a complete LLD document following the structure below
 - Block handoff to the Coding Agent until the plan status is `Approved`
@@ -327,6 +328,7 @@ Notes:          [Any conditions or required changes before implementation]
 6. **Section 2 totals are the Plan Checksum.** The Code Review Agent counts actual CREATE/MODIFY/DELETE files and flags any deviation.
 7. **The plan must be reviewable in under 15 minutes.** If it takes longer, the feature is too large — split it.
 8. **Depth scales verbosity, never safety.** A Low-depth plan is shorter, not less correct — Sections 1, 2, 4, 12, and 14 are always full-detail regardless of Depth, and a Critical-severity accessibility/error-handling concern is stated at every Depth even when its surrounding section is condensed.
+9. **When `feSubtasks` is non-empty, scope to it, not the parent story wholesale.** Section 1 (Summary) should name the FE subtask(s) being implemented; Section 2 (Scope of Change) should list only the files needed to satisfy their ACs plus any gaps the Knowledge Agent's `FeSubtaskCoverage` flagged as partial/missing — do not re-plan work already covered.
 
 ---
 
@@ -379,7 +381,8 @@ After every Draft/Revise invocation returns: the Orchestrator presents the LLD t
 
 - **Mode**: `draft` (first invocation) | `revise` (with the user's feedback/answers from the last round) | `finalize` (with the user's exact "Approved")
 - User story with acceptance criteria
-- Knowledge Agent output (existing components, hooks, services, stores, types)
+- Knowledge Agent output (existing components, hooks, services, stores, types, and `FeSubtaskCoverage` if applicable)
+- `feSubtasks` — the FE/UI-scoped subtasks of the parent story (if any), each with its acceptance criteria, from state file Step 1a
 - `Depth` and assigned model, both from Orchestrator Step 2 (Cost Governor Skill resolves the model per `CostTier`)
 - Target project root path
 - On `revise`/`finalize`: the current draft plan text to work from

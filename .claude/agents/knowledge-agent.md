@@ -24,6 +24,7 @@ The Knowledge Agent is queried by the Dev Orchestrator before delegating impleme
 - Identify which public APIs (`index.ts` re-exports) exist per feature
 - Search for any existing Zod schemas, API service files, or route definitions relevant to the task
 - Report clearly when information is not found and suggest where it might be
+- When the Orchestrator passes `feSubtasks` (FE/UI-scoped subtasks of the parent story, from Step 1a), treat their acceptance criteria as part of the task's real scope — not just the parent story's. Cross-check each subtask's requirements against what already exists in the codebase and flag any that appear already implemented, partially implemented, or not yet started.
 
 ---
 
@@ -57,6 +58,11 @@ For every task, collect answers to these questions:
 
 ### Testing
 - Are there existing test factory functions or fixtures the Unit Test Agent should reuse?
+
+### FE/UI Subtask Requirements (only when `feSubtasks` is non-empty)
+- For each subtask in `feSubtasks`, read its acceptance criteria and map every one against the codebase: already implemented (cite file/line), partially implemented (state the gap), or not started.
+- Surface this mapping explicitly in the output — it is what lets the Planning Agent scope Section 2 (Scope of Change) to only what's actually missing, and lets the Orchestrator decide whether the task is genuinely new work or a verification/gap-fix task.
+- If a subtask's ACs conflict with or narrow the parent story's ACs (the FE subtask is usually a subset — form logic/validation only, not BE persistence or QA), call that out so planning targets the subtask's scope, not the full parent story.
 
 ### Scope & Risk Signals (required — Step 2 cannot run without these)
 
@@ -98,6 +104,7 @@ These two outputs drive the Orchestrator's Step 2 (Depth + CostTier assignment).
 
 - A query describing what context is needed (e.g., "What hooks and services exist for the orders feature?" or "What Zod schemas are defined for user forms?")
 - The feature or domain the task operates in
+- `feSubtasks` — the FE/UI-scoped subtasks of the parent story (if any), each with its acceptance criteria, from state file Step 1a
 - Assigned model for this task. **Note:** this agent runs *before* Step 2 resolves `CostTier`, so its model comes from the pre-Knowledge default in `.claude/context/cost-policy.yaml` (`knowledge_default`), not from a resolved tier. This agent is never invoked in Bypass Workflow.
 
 ## Output to Orchestrator
@@ -106,5 +113,6 @@ These two outputs drive the Orchestrator's Step 2 (Depth + CostTier assignment).
 - List of `index.ts` public APIs to respect
 - Explicit statement if requested information was not found
 - Recommended file paths for new files based on existing conventions
+- **`FeSubtaskCoverage`** — required whenever `feSubtasks` was non-empty in the input: per-AC status (implemented / partial / not started) with file/line citations, and any scope narrowing the FE subtask implies versus the parent story
 - **`LikelyTouchedFiles`** (enumerated list) and **`TouchedFileCount`** — required; consumed by Orchestrator Step 2 signal 2
 - **`EscalationFlag`** (`true` | `false`) with a one-line reason — required; consumed by Orchestrator Step 2 signal 3, and by the Cost Governor Skill to force `CostTier: critical`
