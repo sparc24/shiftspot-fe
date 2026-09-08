@@ -143,4 +143,18 @@ describe('WorkerRegistrationPage', () => {
 
     expect(screen.getByRole('link', { name: /back to role selection/i })).toHaveAttribute('href', '/')
   })
+
+  it('uses sticky-footer layout with flex wrapper and flex-1 main', () => {
+    mockedUseWorkerRegistration.mockReturnValue(createMutation())
+
+    const { container } = renderPage()
+
+    // Root wrapper should have flex layout classes to support sticky footer
+    const wrapper = container.firstChild as HTMLElement
+    expect(wrapper).toHaveClass('flex', 'min-h-screen', 'flex-col', 'bg-brand-bg')
+
+    // Main should have flex-1 to push footer down
+    const main = screen.getByRole('main')
+    expect(main).toHaveClass('flex-1')
+  })
 })

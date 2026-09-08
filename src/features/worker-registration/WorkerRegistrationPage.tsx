@@ -32,7 +32,7 @@ export function WorkerRegistrationPage() {
     : null
 
   return (
-    <div className="min-h-screen bg-brand-bg">
+    <div className="flex min-h-screen flex-col bg-brand-bg">
       <header className="flex items-center justify-between border-b border-brand-border bg-white px-6 py-4">
         <span className="flex items-center gap-2 font-serif text-lg font-bold text-brand-navy">
           <span aria-hidden="true" className="inline-block h-4 w-3 bg-brand-navy" />
@@ -43,7 +43,7 @@ export function WorkerRegistrationPage() {
         </Link>
       </header>
 
-      <main className="mx-auto max-w-5xl px-6 py-10">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
         {mutation.isSuccess ? (
           <SuccessMessage
             title="Registration complete"
