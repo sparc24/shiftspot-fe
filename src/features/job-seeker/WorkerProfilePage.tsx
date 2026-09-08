@@ -36,6 +36,8 @@ export function WorkerProfilePage() {
 
   const isNotFound = !workerId || error?.code === WORKER_NOT_FOUND
 
+  const statusMessage = isLoading ? PROFILE_LOADING_MESSAGE : profile ? `${profile.name} profile loaded` : ''
+
   return (
     <div className="flex min-h-screen flex-col bg-brand-bg">
       <header className="flex items-center justify-between border-b border-brand-border bg-white px-6 py-4">
@@ -55,7 +57,7 @@ export function WorkerProfilePage() {
       <ErrorBoundary>
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6">
           <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
-            {isLoading ? PROFILE_LOADING_MESSAGE : null}
+            {statusMessage}
           </div>
 
           {isLoading ? (
