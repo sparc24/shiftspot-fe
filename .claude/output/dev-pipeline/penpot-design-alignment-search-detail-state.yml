@@ -56,6 +56,15 @@ changedFiles:
   - src/features/landing/LandingPage.tsx
   - src/index.css
   - src/app/Router.test.tsx
+  - src/features/job-seeker/components/WorkerCard.test.tsx
+  - src/features/job-seeker/components/WorkerContactPanel.test.tsx
+  - src/features/job-seeker/components/ContactRow.test.tsx
+  - src/features/job-seeker/components/WorkerProfileHeader.test.tsx
+  - src/features/job-seeker/components/WorkerSearchFilterBar.test.tsx
+  - src/features/job-seeker/WorkerProfilePage.test.tsx
+  - src/features/job-seeker/components/WorkerSearchMessage.test.tsx
+  - src/features/job-seeker/JobSeekerSearchPage.test.tsx
+  - src/features/landing/LandingPage.test.tsx
 completedScopeItems:
   - "orchestrator-gap: this task ran end-to-end (branch, fixes, tests, rebase, PR) without creating this state file at all, in violation of Step 0 (every task, ticket or slug-based, must have one). Backfilled after the user flagged it. CLAUDE.md updated in a follow-up commit to make the omission harder to repeat."
   - "penpot-validation: exported and inspected boards 01/02/03/04/05 directly via the Penpot MCP plugin (execute_code + export_shape) rather than relying on visual impression alone - extracted exact fills, fonts, sizes, and copy per shape"
