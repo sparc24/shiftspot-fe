@@ -55,6 +55,9 @@ export interface WorkerSearchFilters {
 // or both may be duplicated on the same submission.
 export type DuplicateField = 'email' | 'phone'
 
+/** Discriminator for the 404 branch — shared by the mock API and the detail UI. */
+export const WORKER_NOT_FOUND = 'WORKER_NOT_FOUND'
+
 export interface ApiError {
   code: string
   message: string

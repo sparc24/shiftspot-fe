@@ -5,6 +5,7 @@ import type {
   WorkerRegistrationPayload,
   WorkerSearchFilters,
 } from '@/shared/types'
+import { WORKER_NOT_FOUND } from '@/shared/types'
 
 const MOCK_LATENCY_MS = 600
 
@@ -122,8 +123,26 @@ const workerList: Worker[] = [
   ),
 ]
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+// Abort-aware: existing callers (createWorker, searchWorkers) pass no signal
+// and are behaviourally unchanged. When a signal is supplied and already
+// aborted, short-circuits without ever starting a timer; otherwise clears the
+// pending timer and rejects with the signal's abort reason so no closure
+// (and the workerList reference it holds) is kept alive after unmount.
+function delay(ms: number, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) {
+    return Promise.reject(signal.reason)
+  }
+
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(resolve, ms)
+
+    const onAbort = (): void => {
+      clearTimeout(timer)
+      reject(signal?.reason)
+    }
+
+    signal?.addEventListener('abort', onAbort, { once: true })
+  })
 }
 
 const DUPLICATE_MESSAGES: Record<DuplicateField, string> = {
@@ -203,7 +222,28 @@ async function searchWorkers(filters: WorkerSearchFilters): Promise<Worker[]> {
   return workerList.filter((worker) => matchesFilters(worker, filters))
 }
 
+const NOT_FOUND_ERROR: ApiError = {
+  code: WORKER_NOT_FOUND,
+  message: 'Profile Not Found',
+}
+
+// `workerList` is the authoritative lookup source (seeds + runtime
+// registrations); workersByEmail/workersByPhone are uniqueness indexes only
+// and must not be used here. A linear find over a PoC-sized list is correct —
+// no id index is introduced (plan §6.2 / Q12).
+async function getWorkerById(id: string, signal?: AbortSignal): Promise<Worker> {
+  await delay(MOCK_LATENCY_MS, signal)
+
+  const worker = workerList.find((candidate) => candidate.id === id)
+  if (!worker) {
+    return Promise.reject(NOT_FOUND_ERROR)
+  }
+
+  return worker
+}
+
 export const mockWorkerApi = {
   createWorker,
   searchWorkers,
+  getWorkerById,
 }
