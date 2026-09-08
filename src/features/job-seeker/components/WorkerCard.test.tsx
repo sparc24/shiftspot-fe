@@ -106,4 +106,16 @@ describe('WorkerCard', () => {
     expect(avatar).toHaveClass('bg-brand-amber-bg', 'text-brand-amber')
     expect(avatar).not.toHaveClass('bg-brand-navy', 'text-white')
   })
+
+  // Penpot design-alignment regression guard (commit cc5d423): the worker
+  // name heading switched from a serif/bold treatment to sans/semibold.
+  it('WorkerCard_withWorker_nameHeadingUsesSansSemiboldNotSerifBold', () => {
+    const worker = createWorkerView()
+
+    renderCard(worker)
+
+    const heading = screen.getByRole('heading', { name: 'Jane Doe' })
+    expect(heading).toHaveClass('text-lg', 'font-semibold')
+    expect(heading).not.toHaveClass('font-serif', 'font-bold', 'text-base')
+  })
 })

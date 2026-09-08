@@ -22,6 +22,33 @@ describe('WorkerSearchMessage', () => {
       expect(badge).toBeInTheDocument()
       expect(badge?.querySelector('svg')).toBeInTheDocument()
     })
+
+    // Penpot design-alignment regression guard (commit cc5d423): the heading
+    // dropped the serif override in favor of the default sans font, the
+    // layout switched from mt-4/mt-2 margins to a flex+gap column, and the
+    // icon badge/icon grew a size step. Structural class checks only.
+    it('WorkerSearchMessage_withEmptyVariant_usesFlexColumnLayoutWithGapInsteadOfMargins', () => {
+      const { container } = render(<WorkerSearchMessage variant="empty" />)
+
+      const wrapper = container.firstChild as HTMLElement
+      expect(wrapper).toHaveClass('flex', 'flex-col', 'items-center', 'gap-4')
+    })
+
+    it('WorkerSearchMessage_withEmptyVariant_headingUsesSansSemiboldNotSerifBold', () => {
+      render(<WorkerSearchMessage variant="empty" />)
+
+      const heading = screen.getByText('No workers found')
+      expect(heading).toHaveClass('text-xl', 'font-semibold')
+      expect(heading).not.toHaveClass('font-serif', 'font-bold', 'text-lg')
+    })
+
+    it('WorkerSearchMessage_withEmptyVariant_rendersLargerIconBadgeAndIcon', () => {
+      const { container } = render(<WorkerSearchMessage variant="empty" />)
+
+      const badge = container.querySelector('[aria-hidden="true"]')
+      expect(badge).toHaveClass('h-20', 'w-20')
+      expect(badge?.querySelector('svg')).toHaveClass('h-7', 'w-7')
+    })
   })
 
   describe('idle variant', () => {
