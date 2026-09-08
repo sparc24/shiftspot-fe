@@ -1,0 +1,77 @@
+ticketId: "fixed-footer-all-pages"
+workflowType: "bypass"
+currentStep: "pr-opened"
+completedSteps:
+  - parent-branch-selection
+  - task-classification
+  - coding-agent
+  - block-b
+  - rebase-health
+  - pr-opened
+parentBranch: "feature/SLPTWM-115-worker-search-filtering"
+branchName: "feature/SLPTWM-115-worker-search-filtering"
+diverged: false
+
+issueType: null
+storyPoints: null
+feSubtasks: []
+
+depth: null
+costTier: "trivial"
+modelAssignment:
+  knowledge: haiku
+  planning: haiku
+  coding: haiku
+  code_review: haiku
+  unittest: haiku
+  performance_review: haiku
+
+spend:
+  knowledge:           { tokens: null, usd: null }
+  planning:            { tokens: null, usd: null }
+  coding:              { tokens: null, usd: null }
+  code_review:         { tokens: null, usd: null }
+  unittest:            { tokens: null, usd: null }
+  performance_review:  { tokens: null, usd: null }
+  totalTokens: 0
+  totalUsd: 0.00
+
+planApproved: false
+planPath: ""
+planTitle: ""
+planChecksum: { create: 0, modify: 0, delete: 0 }
+planConfluenceUrl: ""
+planConfluenceTitle: ""
+
+changedFiles:
+  - src/features/worker-registration/WorkerRegistrationPage.tsx
+  - src/features/job-seeker/JobSeekerSearchPage.tsx
+  - src/features/worker-registration/WorkerRegistrationPage.test.tsx
+  - src/features/job-seeker/JobSeekerSearchPage.test.tsx
+  - src/test/setup.ts
+completedScopeItems:
+  - "sticky-footer-flex-layout: WorkerRegistrationPage and JobSeekerSearchPage wrapped in flex min-h-screen flex-col with flex-1 main (LandingPage already correct)"
+  - "unit-test-agent: added layout regression guards; introduced an unnecessary @ts-ignore in src/test/setup.ts, reverted by Orchestrator (commit 24eeaef) since the explicit vitest import worked fine"
+  - "rebase-health: no-op (already current with origin/develop), tsc + full suite (138 tests) clean"
+
+testPlan: |
+  - Regression guard: WorkerRegistrationPage and JobSeekerSearchPage wrapper has flex/min-h-screen/flex-col classes, main has flex-1.
+  - Full suite (138 tests, 24 files) re-run clean after the layout change and after reverting an unnecessary test-setup change.
+prSummary: |
+  Pins the shared footer to the bottom of the viewport on every page via a sticky-flex layout
+  (wrapper: flex min-h-screen flex-col; main: flex-1) rather than fixed positioning, avoiding any
+  overlay of interactive content on pages with variable-height content. Applied to
+  WorkerRegistrationPage and JobSeekerSearchPage (LandingPage already used this pattern). Bypass
+  Workflow — no new functionality, existing footer content/copy unchanged.
+prUrl: "https://github.com/sparc24/shiftspot-fe/pull/2"
+confidentialDataOverridden: false
+
+mcpStatus:
+  atlassian: "connected"
+  figma: "skipped"
+  github: "connected"
+startedAt: "2026-09-08T00:00:00Z"
+lastWriter:
+  client: "vscode-extension"
+  sessionId: "6975a533"
+  at: "2026-09-08T00:00:00Z"

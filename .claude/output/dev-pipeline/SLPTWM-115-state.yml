@@ -1,0 +1,141 @@
+ticketId: "SLPTWM-115"
+workflowType: "full"
+currentStep: "pr-opened"
+completedSteps:
+  - parent-branch-selection
+  - task-classification
+  - knowledge-agent
+  - task-signals
+  - planning-agent
+  - plan-approval
+  - coding-agent
+  - block-a
+  - block-b
+  - rebase-health
+  - jira-done
+  - jira-comment
+  - pr-opened
+parentBranch: "develop"
+branchName: "feature/SLPTWM-115-worker-search-filtering"
+diverged: false
+
+# From Step 1a (Jira fetch) — nothing downstream re-fetches the ticket
+issueType: "Story"
+storyPoints: null
+feSubtasks:
+  - key: "SLPTWM-122"
+    summary: "[FE] Implement Worker Search Filter Logic and API Integration"
+    status: "To Do"
+    description: |
+      1. Filter State Management: Track skill selections (array), location (text), age (number); initialize empty/null.
+      2. API Integration: On "Find Workers" click, call search endpoint with filters; handle loading/error/success.
+      3. Conditional Rendering:
+         - No filters applied on mount -> "Start by selecting a skill or location to find workers near you." (AC4)
+         - Loading indicator during fetch
+         - Zero results -> "No workers found matching your criteria. Try adjusting your filters." (AC3)
+         - Results -> worker card grid + result-count text (AC1)
+      4. Multi-select Skill Logic (AC2): Manage chip selections from predefined list; OR logic across selected skills.
+      5. Data mapping: map API response to card props (avatar, name, location, up to 2 skills).
+      6. Optional client-side validation: numeric Age input.
+  - key: "SLPTWM-123"
+    summary: "[UI] Complete interaction states and responsive design for Worker Search filter and results"
+    status: "To Do"
+    description: |
+      Multi-select skill chips: design focus/hover/active/keyboard states (currently not designed); document keyboard operability/tab order for WCAG 2.2 AA.
+      Location and Age input boxes: design focus state (default/filled exist); design error/invalid state.
+      Color contrast: verify gold-on-white and placeholder text contrast meets WCAG 2.2 AA; adjust if needed.
+      Responsive design: define layout/behavior below 1280px for filter bar, results grid, and empty states.
+      Already designed and out of scope here: happy-path grid, multi-select pill pattern, zero-results empty state, first-time-use empty state.
+
+# From Step 2
+depth: "High"                         # signal: TouchedFileCount=12 (7+) + EscalationFlag=true (src/shared/** additions)
+costTier: "critical"                  # EscalationFlag forces critical
+modelAssignment:
+  knowledge: sonnet
+  planning: opus
+  coding: sonnet
+  code_review: opus
+  unittest: sonnet
+  performance_review: sonnet
+
+spend:
+  knowledge:           { tokens: null, usd: null }
+  planning:            { tokens: null, usd: null }
+  coding:              { tokens: null, usd: null }
+  code_review:         { tokens: null, usd: null }
+  unittest:            { tokens: null, usd: null }
+  performance_review:  { tokens: null, usd: null }
+  totalTokens: 0
+  totalUsd: 0.00
+
+# From Planning Agent (Full Workflow only)
+planApproved: true
+planPath: ".claude/output/dev-pipeline/SLPTWM-115-plan.md"
+planTitle: "Worker Search filter logic, API integration, interaction states and responsive design"
+planChecksum: { create: 12, modify: 10, delete: 0 }
+planConfluenceUrl: "https://experionglobal.atlassian.net/wiki/spaces/SLPWM/pages/5861343253/SLPTWM-115-WorkerSearch-Web"
+planConfluenceTitle: "SLPTWM-115-WorkerSearch-Web"
+
+changedFiles:
+  - src/shared/types/worker.ts
+  - src/shared/types/index.ts
+  - src/shared/api/mockWorkerApi.ts
+  - src/shared/services/workerService.ts
+  - src/shared/components/MultiSelect.tsx
+  - src/features/worker-registration/constants.ts
+  - tailwind.config.js
+  - src/features/job-seeker/types.ts
+  - src/features/job-seeker/constants.ts
+  - src/features/job-seeker/validation.ts
+  - src/features/job-seeker/mappers.ts
+  - src/features/job-seeker/hooks/useWorkerSearch.ts
+  - src/features/job-seeker/hooks/index.ts
+  - src/features/job-seeker/components/WorkerSearchFilterBar.tsx
+  - src/features/job-seeker/components/WorkerSearchResults.tsx
+  - src/features/job-seeker/components/WorkerResultsGrid.tsx
+  - src/features/job-seeker/components/WorkerCard.tsx
+  - src/features/job-seeker/components/WorkerSearchMessage.tsx
+  - src/features/job-seeker/components/index.ts
+  - src/features/job-seeker/JobSeekerSearchPage.tsx
+  - src/features/job-seeker/index.ts
+completedScopeItems:
+  - shared-types-and-mock-search-api
+  - multiselect-a11y-contrast-fix
+  - job-seeker-types-schema-mappers-hook
+  - job-seeker-components
+  - job-seeker-page-wiring
+  - "block-a-cycle-1: tsc clean; code-review No-Go (0 Critical, 3 Major - WorkerCard skills list a11y x2, retry loading state)"
+  - "block-a-rework: fixed all 3 Majors in commit 0cef0bb; scoped re-review Go, tsc clean"
+  - "block-b: unit tests Go (136 tests/24 files pass, 99.4% stmt/98.6% branch coverage, one flagged structurally-unreachable branch in useWorkerSearch.ts); performance review Go (no Blocking/Warnings)"
+
+testPlan: |
+  - Idle/loading/zero-results/results/error states across JobSeekerSearchPage and WorkerSearchResults.
+  - Filter bar validation (age/location) and normalisation; skill chip multi-select incl. keyboard (Space toggles).
+  - WorkerCard accessibility (role="list", aria-label="Skills") and skill-badge capping to MAX_CARD_SKILLS.
+  - mockWorkerApi search matching semantics: skill OR, location case-insensitive substring, age exact, AND across dimensions, empty-filter browse-all.
+  - useWorkerSearch hook: disabled-when-null gating, success path, error path.
+  - MultiSelect required={false} regression guard so worker-registration's aria-required="true" usage can't silently break.
+  - Full suite (136 tests, 24 files) run non-scoped to confirm the new 8-worker seed data doesn't collide with existing worker-registration duplicate-detection tests (plan Q17).
+prSummary: |
+  Implements SLPTWM-115's FE/UI subtasks (SLPTWM-122, SLPTWM-123): turns the /seeker/search placeholder into a
+  working Worker Search screen with skill/location/age filtering. Adds a React Hook Form + Zod filter bar (skill
+  chips, Location, Age), a TanStack Query useWorkerSearch hook, and a results view covering all four required
+  states (first-use idle, loading, zero-results, results grid with count). Extends the shared mock worker API with
+  a searchWorkers function (skill OR-match, location substring, exact age, AND across dimensions) and seed data,
+  and fixes a real WCAG 1.4.11 contrast failure in the shared MultiSelect skill-chip component (new amber-dark
+  token + check glyph), which also improves the existing Worker Registration screen's chips. Code review caught
+  and fixed two accessibility issues in WorkerCard's skill list and a TanStack Query v5 retry-loading-state bug
+  before merge. 136 tests pass (99.4% statement / 98.6% branch coverage) with no interference from the new seed
+  data on existing registration tests.
+prUrl: "https://github.com/sparc24/shiftspot-fe/pull/2"
+confidentialDataOverridden: false
+
+mcpStatus:
+  atlassian: "connected"
+  figma: "skipped"
+  github: "unknown"
+startedAt: "2026-09-08T00:00:00Z"
+lastWriter:
+  client: "vscode-extension"
+  sessionId: "6975a533"
+  at: "2026-09-08T00:00:00Z"
