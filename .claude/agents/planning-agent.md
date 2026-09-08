@@ -294,6 +294,7 @@ const createOrderSchema = z.object({
 - [ ] All API calls go through the service layer — no direct `fetch`/`axios` in components
 - [ ] Forms use React Hook Form + Zod — no manual form state
 - [ ] Unit tests planned — each new hook and service method has happy-path and failure tests
+- [ ] Confidential data and environment-specific endpoints (API base URLs, keys, tokens) are read from `import.meta.env.VITE_*` and documented in `.env.example` — never hardcoded in source
 
 ---
 

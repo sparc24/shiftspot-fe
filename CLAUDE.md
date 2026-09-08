@@ -271,6 +271,9 @@ completedScopeItems: []
 testPlan: ""
 prSummary: ""
 prUrl: ""                             # set once the PR is actually open
+confidentialDataOverridden: false     # true only if the GitHub PR Skill's Step 0 found a
+                                       # possible match and the user explicitly said "push
+                                       # anyway" (Rule 25) — never set by an automatic pass
 
 mcpStatus:                            # always overwritten by the current session's probe, never restored
   atlassian: "connected"
@@ -525,6 +528,8 @@ Every sub-step writes to the state file as it completes — the Jira Comment Ski
    | `TestPlan` | `testPlan` (written by Block B) |
    | `ConfluenceUrl` | `planConfluenceUrl`, if set (Full Workflow only) |
 
+   Before pushing anything, this skill's own Step 0 (Confidential Data Check) runs unconditionally — see Rule 25. If it finds a possible match, that human gate takes priority over everything below: do not proceed to `Status: Created`/`Failed` handling until the user has responded.
+
 4. **On `Status: Created`** → record `prUrl`, add `pr-opened` to `completedSteps`, and report the URL in the conversation. **Keep the state file** — per Step 0's Retention rule, it is never deleted automatically, success or failure alike, since the ticket can still need further work (review feedback, a design-alignment fix) before it merges, and that work must keep accumulating into this same file's `spend.*`.
 
    **On `Status: Failed`** → **keep the state file** (same treatment as success, just without `pr-opened` recorded yet), set `currentStep: rebase-health`, and report the failure plus the manual fallback command (`gh pr create --base <parentBranch> --head <branchName> ...`). `gh` auth failure is a documented degradation path (the MCP Health Check lets the GitHub CLI degrade gracefully "until the PR step actually needs it"), so this is a realistic outcome, not a corner case.
@@ -559,6 +564,7 @@ Continuing...
 - Coding Agent Gate 1 (neither an approved plan nor `workflowType: bypass`), Gate 2, and Gate 3 `Status: Failed`
 - Git Branch Skill `Diverged: true` gate
 - Missing `test_command` configuration
+- GitHub PR Skill's confidential-data gate (Step 0), whenever a possible match is found
 
 This rule is about *incidental* tool/service failures that have a reasonable fallback (Figma unreachable, a Notify toast failing, a Jira comment erroring), not the pipeline's designed decision points.
 
@@ -596,3 +602,4 @@ This rule is about *incidental* tool/service failures that have a reasonable fal
     - After merging, set `lastWriter: { client, sessionId, at }` to this session's own values — this is what lets the *other* session detect the same condition on its own next write.
 
     If the freshly-read `lastWriter.sessionId` differs from what this session itself last wrote, surface the one-line notice described in "Retention, mid-step resume, and concurrent sessions" before continuing — never proceed silently.
+25. **No confidential data is ever pushed to a remote without the user's explicit, informed approval.** The GitHub PR Skill's Step 0 (Confidential Data Check) runs before every `git push` in this pipeline — there is no push path that skips it, including a retry after a failed `gh pr create`. A clean scan proceeds automatically; any match is a designed human gate (see the Fallback Transparency Rule's exception list) — show the user what matched (redacted) and ask `push anyway` vs. `fix it first`, never decide for them and never push while the question is open. If the user overrides and pushes anyway, record `confidentialDataOverridden: true` in the state file so the override stays visible after the fact rather than vanishing into a one-off conversation turn.
