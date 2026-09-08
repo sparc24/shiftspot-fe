@@ -28,7 +28,7 @@ describe('Router', () => {
   it('renders the worker registration page at /worker/register', async () => {
     renderRouter('/worker/register')
 
-    expect(await screen.findByRole('heading', { name: /list your skills/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /worker registration/i })).toBeInTheDocument()
   })
 
   it('renders the job seeker placeholder page at /seeker/search', async () => {

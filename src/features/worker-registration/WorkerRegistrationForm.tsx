@@ -56,7 +56,7 @@ export function WorkerRegistrationForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
-      <FormField id="name" label="Full name" required error={errors.name?.message}>
+      <FormField id="name" label="Name" required error={errors.name?.message}>
         <TextInput
           id="name"
           placeholder="e.g. John Doe"
@@ -77,7 +77,7 @@ export function WorkerRegistrationForm({
         <TextInput
           id="email"
           type="email"
-          placeholder="e.g. john@example.com"
+          placeholder="name@example.com"
           invalid={!!errors.email}
           aria-required="true"
           aria-describedby={errors.email ? 'email-error' : 'email-hint'}
@@ -85,11 +85,11 @@ export function WorkerRegistrationForm({
         />
       </FormField>
 
-      <FormField id="phone" label="Phone number" required error={errors.phone?.message}>
+      <FormField id="phone" label="Phone Number" required error={errors.phone?.message}>
         <TextInput
           id="phone"
           type="tel"
-          placeholder="10-digit mobile number"
+          placeholder="9876543210"
           invalid={!!errors.phone}
           aria-required="true"
           aria-describedby={errors.phone ? 'phone-error' : undefined}
@@ -100,7 +100,7 @@ export function WorkerRegistrationForm({
       <FormField id="location" label="Location" required error={errors.location?.message}>
         <TextInput
           id="location"
-          placeholder="e.g. New York"
+          placeholder="City, Country"
           invalid={!!errors.location}
           aria-required="true"
           aria-describedby={errors.location ? 'location-error' : undefined}
@@ -112,7 +112,7 @@ export function WorkerRegistrationForm({
         <TextInput
           id="age"
           type="number"
-          placeholder="e.g. 30"
+          placeholder="30"
           invalid={!!errors.age}
           aria-required="true"
           aria-describedby={errors.age ? 'age-error' : undefined}
@@ -151,14 +151,14 @@ export function WorkerRegistrationForm({
         )}
       />
 
-      <div className="mt-2 flex items-center gap-6">
-        <Button type="submit" variant="dark" isLoading={isSubmitting}>
+      <div className="mt-2 flex flex-col items-stretch gap-3">
+        <Button type="submit" variant="dark" isLoading={isSubmitting} className="w-full">
           Submit Profile
         </Button>
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="text-sm font-medium text-gray-600 hover:text-gray-900 hover:underline"
+          className="text-sm font-medium text-brand-muted hover:text-brand-navy hover:underline"
         >
           Cancel
         </button>

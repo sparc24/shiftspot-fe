@@ -31,23 +31,14 @@ export function MultiSelect({ id, name, options, value, onChange, invalid = fals
       aria-required="true"
       aria-labelledby={`${id}-label`}
       aria-describedby={describedById}
-      className={`rounded-md border p-3 ${invalid ? 'border-red-500' : 'border-gray-300'}`}
+      className={`rounded-lg border p-3 ${invalid ? 'border-red-500' : 'border-brand-border'}`}
     >
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="flex flex-wrap gap-2.5">
         {options.map((option) => {
           const optionId = `${name}-${option.value}`
           const checked = value.includes(option.value)
           return (
-            <div
-              key={option.value}
-              className={`relative flex items-center gap-2 rounded-md border p-3 transition-colors ${
-                checked ? 'border-slate-800 bg-blue-50' : 'border-gray-300 bg-white'
-              }`}
-            >
-              <span
-                aria-hidden="true"
-                className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border border-gray-300 bg-gray-100"
-              />
+            <div key={option.value} className="relative">
               <input
                 id={optionId}
                 type="checkbox"
@@ -55,9 +46,16 @@ export function MultiSelect({ id, name, options, value, onChange, invalid = fals
                 value={option.value}
                 checked={checked}
                 onChange={(event) => handleToggle(option.value, event.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+                className="peer sr-only"
               />
-              <label htmlFor={optionId} className="text-sm font-semibold text-gray-800">
+              <label
+                htmlFor={optionId}
+                className={`inline-flex cursor-pointer items-center rounded-full border px-4 py-2 text-sm font-semibold transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-brand-navy ${
+                  checked
+                    ? 'border-brand-amber bg-brand-amber-bg text-brand-navy'
+                    : 'border-brand-border bg-white text-brand-muted hover:border-brand-amber'
+                }`}
+              >
                 {option.label}
               </label>
             </div>

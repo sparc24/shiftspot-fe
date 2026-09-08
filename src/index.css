@@ -1,13 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Inter+Tight:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-white text-gray-800 antialiased;
+    @apply bg-brand-bg font-sans text-brand-navy antialiased;
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-offset-2 ring-blue-600;
+    @apply outline-none ring-2 ring-offset-2 ring-brand-navy;
   }
 }

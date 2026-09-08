@@ -61,11 +61,11 @@ describe('MultiSelect', () => {
       <MultiSelect id="skills" name="skills" options={options} value={['plumbing']} onChange={vi.fn()} />,
     )
 
-    const checkedChip = screen.getByLabelText('Plumbing').closest('div')
-    const uncheckedChip = screen.getByLabelText('Electrical').closest('div')
+    const checkedChip = screen.getByLabelText('Plumbing').closest('div')?.querySelector('label')
+    const uncheckedChip = screen.getByLabelText('Electrical').closest('div')?.querySelector('label')
 
-    expect(checkedChip).toHaveClass('border-slate-800')
-    expect(uncheckedChip).not.toHaveClass('border-slate-800')
+    expect(checkedChip).toHaveClass('bg-brand-amber-bg')
+    expect(uncheckedChip).not.toHaveClass('bg-brand-amber-bg')
   })
 
   it('associates the group with its label and error via aria attributes', () => {

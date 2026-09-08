@@ -53,7 +53,7 @@ describe('WorkerRegistrationPage', () => {
 
     renderPage()
 
-    expect(screen.getByRole('heading', { name: /list your skills/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /worker registration/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /submit profile/i })).toBeInTheDocument()
   })
 
@@ -87,7 +87,7 @@ describe('WorkerRegistrationPage', () => {
 
     renderPage()
 
-    const banner = screen.getByText(/we couldn't submit your profile/i).closest('[role="alert"]')
+    const banner = screen.getByText(/profile already exists/i).closest('[role="alert"]')
     expect(banner).toHaveTextContent(
       /a profile with this email or phone number already exists/i,
     )
@@ -114,7 +114,7 @@ describe('WorkerRegistrationPage', () => {
     mockedUseWorkerRegistration.mockReturnValue(mutation)
 
     renderPage()
-    await user.type(screen.getByLabelText(/full name/i), 'Jane Doe')
+    await user.type(screen.getByLabelText(/^name/i), 'Jane Doe')
     await user.type(screen.getByLabelText(/email id/i), 'jane@example.com')
     await user.type(screen.getByLabelText(/phone number/i), '9876543210')
     await user.type(screen.getByLabelText(/^location/i), 'New York')

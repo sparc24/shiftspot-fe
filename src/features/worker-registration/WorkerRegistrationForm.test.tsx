@@ -40,7 +40,7 @@ describe('WorkerRegistrationForm', () => {
     const user = userEvent.setup()
     const { onSubmit } = renderForm()
 
-    await user.type(screen.getByLabelText(/full name/i), 'Jane Doe')
+    await user.type(screen.getByLabelText(/^name/i), 'Jane Doe')
     await user.type(screen.getByLabelText(/email id/i), 'jane@example.com')
     await user.type(screen.getByLabelText(/phone number/i), '9876543210')
     await user.type(screen.getByLabelText(/location/i), 'New York')
@@ -73,7 +73,7 @@ describe('WorkerRegistrationForm', () => {
   it('marks every mandatory field as aria-required', () => {
     renderForm()
 
-    for (const label of [/full name/i, /email id/i, /phone number/i, /^location/i, /age/i]) {
+    for (const label of [/^name/i, /email id/i, /phone number/i, /^location/i, /age/i]) {
       expect(screen.getByLabelText(label)).toHaveAttribute('aria-required', 'true')
     }
   })
@@ -85,7 +85,7 @@ describe('WorkerRegistrationForm', () => {
     await user.click(screen.getByRole('button', { name: /submit profile/i }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/full name/i)).toHaveFocus()
+      expect(screen.getByLabelText(/^name/i)).toHaveFocus()
     })
   })
 
@@ -94,7 +94,7 @@ describe('WorkerRegistrationForm', () => {
     renderForm()
 
     await user.tab()
-    expect(screen.getByLabelText(/full name/i)).toHaveFocus()
+    expect(screen.getByLabelText(/^name/i)).toHaveFocus()
 
     await user.tab()
     expect(screen.getByLabelText(/email id/i)).toHaveFocus()
@@ -115,13 +115,13 @@ describe('WorkerRegistrationForm', () => {
 
     await user.click(screen.getByRole('button', { name: /submit profile/i }))
     await waitFor(() => {
-      expect(screen.getByLabelText(/full name/i)).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByLabelText(/^name/i)).toHaveAttribute('aria-invalid', 'true')
     })
 
-    await user.type(screen.getByLabelText(/full name/i), 'Jane Doe')
+    await user.type(screen.getByLabelText(/^name/i), 'Jane Doe')
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/full name/i)).toHaveAttribute('aria-invalid', 'false')
+      expect(screen.getByLabelText(/^name/i)).toHaveAttribute('aria-invalid', 'false')
     })
   })
 

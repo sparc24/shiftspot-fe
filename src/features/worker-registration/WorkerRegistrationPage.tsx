@@ -20,13 +20,13 @@ export function WorkerRegistrationPage() {
     : null
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
-        <span className="flex items-center gap-2 text-lg font-bold text-gray-900">
-          <span aria-hidden="true" className="inline-block h-4 w-3 bg-slate-900" />
+    <div className="min-h-screen bg-brand-bg">
+      <header className="flex items-center justify-between border-b border-brand-border bg-white px-6 py-4">
+        <span className="flex items-center gap-2 font-serif text-lg font-bold text-brand-navy">
+          <span aria-hidden="true" className="inline-block h-4 w-3 bg-brand-navy" />
           ShiftSpot
         </span>
-        <Link to="/" className="text-sm font-medium text-slate-700 hover:text-slate-900 hover:underline">
+        <Link to="/" className="text-sm font-medium text-brand-muted hover:text-brand-navy hover:underline">
           ← Back to role selection
         </Link>
       </header>
@@ -39,32 +39,29 @@ export function WorkerRegistrationPage() {
           />
         ) : (
           <>
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Worker profile</p>
-            <h1 className="mt-1 text-3xl font-bold text-gray-900">List your skills</h1>
-            <p className="mt-2 max-w-2xl text-sm text-gray-600">
-              Fill in your details so job seekers nearby can find you and reach out directly. All fields
-              are required.
-            </p>
+            <h1 className="text-center font-serif text-3xl font-bold text-brand-navy">
+              Worker Registration
+            </h1>
 
             {bannerMessage ? (
-              <div role="alert" className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+              <div role="alert" className="mx-auto mt-6 max-w-xl rounded-lg border border-brand-amber bg-brand-amber-bg p-4">
                 <div className="flex items-start gap-3">
                   <span
                     aria-hidden="true"
-                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-700 text-sm font-bold text-white"
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-amber text-sm font-bold text-white"
                   >
                     !
                   </span>
                   <div>
-                    <p className="font-semibold text-red-900">We couldn&apos;t submit your profile</p>
-                    <p className="mt-1 text-sm text-red-800">{bannerMessage}</p>
+                    <p className="font-semibold text-brand-navy">Profile already exists</p>
+                    <p className="mt-1 text-sm text-brand-navy/80">{bannerMessage}</p>
                   </div>
                 </div>
               </div>
             ) : null}
 
-            <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-              <div className="lg:col-span-2">
+            <div className="mx-auto mt-8 max-w-xl">
+              <div className="rounded-2xl border border-brand-border bg-white p-8 shadow-sm">
                 <WorkerRegistrationForm
                   onSubmit={handleSubmit}
                   isSubmitting={mutation.isPending}
@@ -72,13 +69,13 @@ export function WorkerRegistrationPage() {
                 />
               </div>
 
-              <aside className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm lg:col-span-1">
-                <h2 className="font-bold text-gray-900">Why we ask this</h2>
-                <p className="mt-2 text-sm text-gray-600">
+              <aside className="mt-6 rounded-lg border border-brand-border bg-white p-5 shadow-sm">
+                <h2 className="font-serif font-bold text-brand-navy">Why we ask this</h2>
+                <p className="mt-2 text-sm text-brand-muted">
                   ShiftSpot is a direct-contact directory — there&apos;s no login. Your email and phone
                   are shown only to job seekers who view your profile.
                 </p>
-                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-gray-600">
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-brand-muted">
                   <li>Email and phone must be unique</li>
                   <li>Pick every skill that applies</li>
                   <li>You can be listed within seconds</li>
@@ -88,6 +85,13 @@ export function WorkerRegistrationPage() {
           </>
         )}
       </main>
+
+      <footer className="border-t border-brand-border bg-white px-6 py-4">
+        <div className="mx-auto flex max-w-5xl flex-col gap-1 text-xs text-brand-muted sm:flex-row sm:items-center sm:justify-between">
+          <span>Worker Registration</span>
+          <span>ShiftSpot PoC</span>
+        </div>
+      </footer>
     </div>
   )
 }
