@@ -54,14 +54,14 @@ modelAssignment:
   performance_review: sonnet
 
 spend:
-  knowledge:           { tokens: null, usd: null }
-  planning:            { tokens: null, usd: null }
-  coding:              { tokens: null, usd: null }
-  code_review:         { tokens: null, usd: null }
-  unittest:            { tokens: null, usd: null }
-  performance_review:  { tokens: null, usd: null }
-  totalTokens: 0
-  totalUsd: 0.00
+  knowledge:           { tokens: 45549,  usd: 0.27 }
+  planning:            { tokens: 90094,  usd: 1.35 }
+  coding:              { tokens: 226119, usd: 1.36 }   # 150414 (initial) + 75705 (Block A rework)
+  code_review:         { tokens: 187792, usd: 2.82 }   # 125361 (initial) + 62431 (scoped re-review)
+  unittest:            { tokens: 154238, usd: 0.93 }
+  performance_review:  { tokens: 84421,  usd: 0.51 }
+  totalTokens: 788213
+  totalUsd: 7.23
 
 planApproved: true
 planPath: ".claude/output/dev-pipeline/SLPTWM-116-plan.md"
