@@ -1,0 +1,92 @@
+ticketId: "penpot-design-alignment-search-detail"
+workflowType: "bypass"
+currentStep: "block-b"
+completedSteps:
+  - parent-branch-selection
+  - task-classification
+  - coding-agent
+  - block-b
+  - rebase-health
+  - pr-opened
+parentBranch: "develop"
+branchName: "fix/penpot-design-alignment-search-detail"
+diverged: false
+
+issueType: null
+storyPoints: null
+feSubtasks: []
+
+depth: null
+costTier: "trivial"
+modelAssignment:
+  knowledge: haiku
+  planning: haiku
+  coding: haiku
+  code_review: haiku
+  unittest: sonnet
+  performance_review: haiku
+
+spend:
+  knowledge:           { tokens: null, usd: null }
+  planning:            { tokens: null, usd: null }
+  coding:              { tokens: null, usd: null }
+  code_review:         { tokens: null, usd: null }
+  unittest:            { tokens: null, usd: null }
+  performance_review:  { tokens: null, usd: null }
+  totalTokens: 0
+  totalUsd: 0.00
+
+planApproved: false
+planPath: ""
+planTitle: ""
+planChecksum: { create: 0, modify: 0, delete: 0 }
+planConfluenceUrl: ""
+planConfluenceTitle: ""
+
+changedFiles:
+  - src/features/job-seeker/components/WorkerCard.tsx
+  - src/features/job-seeker/components/WorkerContactPanel.tsx
+  - src/features/job-seeker/components/ContactRow.tsx
+  - src/features/job-seeker/components/WorkerProfileHeader.tsx
+  - src/features/job-seeker/components/WorkerSearchFilterBar.tsx
+  - src/features/job-seeker/WorkerProfilePage.tsx
+  - src/features/job-seeker/components/WorkerSearchMessage.tsx
+  - src/features/job-seeker/components/ContactIcons.tsx
+  - src/features/job-seeker/JobSeekerSearchPage.tsx
+  - src/features/landing/LandingPage.tsx
+  - src/index.css
+  - src/app/Router.test.tsx
+completedScopeItems:
+  - "orchestrator-gap: this task ran end-to-end (branch, fixes, tests, rebase, PR) without creating this state file at all, in violation of Step 0 (every task, ticket or slug-based, must have one). Backfilled after the user flagged it. CLAUDE.md updated in a follow-up commit to make the omission harder to repeat."
+  - "penpot-validation: exported and inspected boards 01/02/03/04/05 directly via the Penpot MCP plugin (execute_code + export_shape) rather than relying on visual impression alone - extracted exact fills, fonts, sizes, and copy per shape"
+  - "commit-128146e: notch-panel/notch-btn cut-corner treatment (existed in CSS, only ever wired to Landing) applied to WorkerCard, WorkerSearchFilterBar's Find Workers button, WorkerProfilePage's card wrapper, and WorkerContactPanel's Contact Worker button; avatar colors navy->amber; Contact Panel restructured into one unified gray container with amber icon badges; copy fixes (Skill Filter, Phone Number, Email ID, Contact Details, e.g. placeholders); empty-results state given its icon+heading"
+  - "commit-33fa605 (unit test agent): 20 regression tests added locking in the above; full suite independently re-verified 199/199 after clearing a stale node_modules/.vite cache"
+  - "commit-cc5d423: live-rendered the app via Playwright against a local dev server (not just code inspection) and found 4 more real deviations the first pass missed - Job Seeker button's outline notch wasn't rendering AT ALL (isolated and reproduced the root cause: the mask-composite border-ring CSS technique doesn't work on non-rectangular clip-path, fixed with a two-layer stacked-fill approach instead), empty-state heading font/size/spacing wrong, Search Workers page heading said 'Search for Workers' instead of 'Search Workers', and result-card names used serif/bold instead of the design's sans/semibold"
+  - "deliberately not fixed: Skill Filter's visual pattern (design shows a compact combobox with inline selected chips + caret; current implementation shows an always-visible chip fieldset) - a different component, not a style tweak, flagged for its own review rather than folded into this pass"
+
+testPlan: |
+  - Regression tests (commit 33fa605) locking in: notch-panel/notch-btn class presence on WorkerCard/WorkerProfilePage/Find-Workers-button/Contact-Worker-button; amber (not navy) avatar and icon-badge colors; "Contact Details"/"Phone Number"/"Email ID"/"Skill Filter" text; "e.g." placeholders; empty-state heading+icon.
+  - Full suite independently re-verified by the orchestrator after every commit (not just the authoring agent's self-report), including after the second commit's additional fixes: 199/199 passing, tsc clean.
+  - Manually verified via a live Playwright-driven render against the local dev server (search results, empty state, and worker detail screens) rather than relying on test assertions alone, since visual/CSS-rendering bugs (like the outline button's notch not rendering) don't show up as test failures in jsdom.
+prSummary: |
+  Second pass on design validation against the Penpot file (design.penpot.app, file c828d3cf) covering
+  Search Workers, Search Results (Empty State), Worker Detail, and one Landing page bug. First pass
+  (already in this PR) fixed missing notch-cut treatment, wrong avatar/icon colors, a missing card
+  container on the Worker Detail page, and several copy mismatches. This pass, triggered by user
+  feedback that the empty state still didn't match and a Landing button looked wrong, live-rendered the
+  actual app via Playwright to catch what code inspection alone missed: the Landing page's outline
+  "Act as a Job Seeker" button had a genuinely broken CSS technique (its notch corner never rendered at
+  all, reproduced in isolation to confirm root cause), the empty-state heading's font/size didn't match,
+  the Search Workers page title had an extra word, and result-card names used the wrong font weight/family.
+prUrl: "https://github.com/sparc24/shiftspot-fe/pull/4"
+confidentialDataOverridden: false
+
+mcpStatus:
+  atlassian: "connected"
+  figma: "skipped"
+  github: "connected"
+startedAt: "2026-09-09T00:00:00Z"
+lastWriter:
+  client: "vscode-extension"
+  sessionId: "6975a533"
+  at: "2026-09-09T00:00:00Z"
