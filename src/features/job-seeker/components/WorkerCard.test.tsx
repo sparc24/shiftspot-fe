@@ -77,6 +77,10 @@ describe('WorkerCard', () => {
 
     renderCard(worker)
 
-    expect(screen.getByRole('listitem')).toBeInTheDocument()
+    // Scoped via the link's parent, not screen.getByRole('listitem') directly —
+    // the nested skill <li> elements also carry an implicit listitem role, so
+    // an unscoped query throws on "multiple elements found".
+    const link = screen.getByRole('link')
+    expect(link.parentElement).toHaveAttribute('role', 'listitem')
   })
 })
