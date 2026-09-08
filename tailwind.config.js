@@ -9,6 +9,7 @@ export default {
           muted: '#55677e',
           amber: '#c99a2e',
           'amber-bg': '#f3dfa4',
+          'amber-dark': '#7a5d12',
           border: '#e2e4e8',
           bg: '#ecedef',
         },
