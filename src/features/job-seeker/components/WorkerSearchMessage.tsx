@@ -18,15 +18,15 @@ const MESSAGE_BY_VARIANT: Record<SearchMessageVariant, string> = {
 export function WorkerSearchMessage({ variant }: WorkerSearchMessageProps) {
   if (variant === 'empty') {
     return (
-      <div className="mx-auto max-w-md text-center">
+      <div className="mx-auto flex max-w-md flex-col items-center gap-4 text-center">
         <span
           aria-hidden="true"
-          className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-amber-bg text-brand-amber"
+          className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-amber-bg text-brand-amber"
         >
-          <SearchIcon />
+          <SearchIcon className="h-7 w-7" />
         </span>
-        <p className="mt-4 font-serif text-lg font-bold text-brand-navy">No workers found</p>
-        <p className="mt-2 text-sm text-brand-muted">{SEARCH_EMPTY_MESSAGE}</p>
+        <p className="text-xl font-semibold text-brand-navy">No workers found</p>
+        <p className="text-base text-brand-muted">{SEARCH_EMPTY_MESSAGE}</p>
       </div>
     )
   }

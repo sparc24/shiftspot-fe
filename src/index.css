@@ -48,24 +48,23 @@
   .notch-btn {
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
   }
-  .notch-btn-outline {
-    position: relative;
-  }
-  .notch-btn-outline::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    padding: 1.5px;
-    clip-path: inherit;
+
+  /*
+   * Outline variant of the notch button: the mask-composite "::before ring"
+   * technique used by .notch-panel does NOT reliably render a border along a
+   * non-rectangular clip-path — verified by isolating a bare element with
+   * only this class applied (no other page styles) and finding the ring
+   * still fails to paint along the diagonal/top edge. A solid clip-path FILL
+   * (as .notch-btn already relies on for the dark button) always renders
+   * correctly; only the border-only ring construction is broken. So the
+   * outline button uses two stacked solid-fill notch shapes instead of a
+   * border: an outer navy shape and an inner white shape inset by the
+   * border width, applied via .notch-btn-outline-frame (parent) wrapping a
+   * .notch-btn (child) — see LandingPage.tsx for the markup.
+   */
+  .notch-btn-outline-frame {
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
     background: theme('colors.brand.navy');
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+    padding: 1.5px;
   }
 }

@@ -56,13 +56,15 @@ export function LandingPage() {
               Filter by skill, location, and age to find the right person, then reach out with their
               phone or email.
             </p>
-            <Button
-              variant="outline-dark"
-              onClick={() => navigate('/seeker/search')}
-              className="notch-btn notch-btn-outline relative mt-8 w-full !rounded-none !border-0"
-            >
-              Act as a Job Seeker
-            </Button>
+            <div className="notch-btn-outline-frame mt-8">
+              <Button
+                variant="outline-dark"
+                onClick={() => navigate('/seeker/search')}
+                className="notch-btn w-full !rounded-none !border-0"
+              >
+                Act as a Job Seeker
+              </Button>
+            </div>
           </div>
         </div>
       </main>

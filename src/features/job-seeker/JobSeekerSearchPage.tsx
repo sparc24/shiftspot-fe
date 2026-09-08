@@ -38,7 +38,7 @@ export function JobSeekerSearchPage() {
       <ErrorBoundary>
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
           <h1 className="text-center font-serif text-3xl font-bold text-brand-navy">
-            Search for Workers
+            Search Workers
           </h1>
 
           <div className="mx-auto mt-8">

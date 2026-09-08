@@ -25,7 +25,7 @@ export function WorkerCard({ worker }: WorkerCardProps) {
             {worker.initials}
           </span>
           <div className="min-w-0">
-            <h3 className="truncate font-serif text-base font-bold text-brand-navy">{worker.name}</h3>
+            <h3 className="truncate text-lg font-semibold text-brand-navy">{worker.name}</h3>
             <p className="truncate text-sm text-brand-muted">
               <span className="sr-only">Location: </span>
               {worker.location}
