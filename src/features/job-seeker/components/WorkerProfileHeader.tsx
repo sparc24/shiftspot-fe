@@ -12,7 +12,7 @@ export function WorkerProfileHeader({ profile }: WorkerProfileHeaderProps) {
       <div className="flex items-center gap-4">
         <span
           aria-hidden="true"
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-navy text-xl font-bold text-white"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-amber-bg text-xl font-bold text-brand-amber"
         >
           {profile.initials}
         </span>

@@ -15,12 +15,12 @@ export function WorkerCard({ worker }: WorkerCardProps) {
     <div role="listitem">
       <Link
         to={`/seeker/worker/${encodeURIComponent(worker.id)}`}
-        className="flex flex-col gap-3 rounded-lg border border-brand-border bg-white p-4 shadow-sm transition-shadow hover:shadow-md hover:border-brand-navy/20 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-navy active:shadow-sm"
+        className="notch-panel relative flex flex-col gap-3 bg-white p-4 shadow-sm transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-navy active:shadow-sm"
       >
         <div className="flex items-center gap-3">
           <span
             aria-hidden="true"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-white"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-amber-bg text-sm font-semibold text-brand-amber"
           >
             {worker.initials}
           </span>
