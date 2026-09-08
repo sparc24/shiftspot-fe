@@ -21,7 +21,7 @@ export function JobSeekerSearchPage() {
   }, [refetch])
 
   return (
-    <div className="min-h-screen bg-brand-bg">
+    <div className="flex min-h-screen flex-col bg-brand-bg">
       <header className="flex items-center justify-between border-b border-brand-border bg-white px-6 py-4">
         <span className="flex items-center gap-2 font-serif text-lg font-bold text-brand-navy">
           <span aria-hidden="true" className="inline-block h-4 w-3 bg-brand-navy" />
@@ -36,7 +36,7 @@ export function JobSeekerSearchPage() {
       </header>
 
       <ErrorBoundary>
-        <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
           <h1 className="text-center font-serif text-3xl font-bold text-brand-navy">
             Search for Workers
           </h1>
