@@ -1,0 +1,132 @@
+ticketId: "SLPTWM-116"
+workflowType: "full"
+currentStep: "pr-opened"
+completedSteps:
+  - parent-branch-selection
+  - task-classification
+  - knowledge-agent
+  - task-signals
+  - planning-agent
+  - plan-approval
+  - coding-agent
+  - block-a
+  - block-b
+  - rebase-health
+  - jira-done
+  - jira-comment
+  - pr-opened
+parentBranch: "develop"
+branchName: "feature/SLPTWM-116-worker-profile-detail"
+diverged: false
+
+issueType: "Story"
+storyPoints: null
+feSubtasks:
+  - key: "SLPTWM-126"
+    summary: "[FE] Worker Detail Screen: Profile Data Fetching and State Management"
+    status: "To Do"
+    description: |
+      Implement Worker Detail screen to fetch and conditionally render worker profile by ID.
+      - Extract worker ID from route/URL param; fetch profile (GET /workers/{id})
+      - Manage loading, error (404), and success states
+      - Success (AC1/AC2): render Profile Header (name, avatar, location, age), skill chips, Contact Panel (Phone/Email rows), Contact Worker button, clickable contact links
+      - Error (AC3): display "Profile Not Found"; do not render profile components
+      - Implement back navigation link to search results
+      - Handle request cancellation on unmount
+  - key: "SLPTWM-127"
+    summary: "[UI] Worker Profile Detail — Interactive States, Error State, and Accessibility"
+    status: "To Do"
+    description: |
+      1. Error State: design "Profile Not Found" visual treatment (recommend reusing the warning-panel pattern) for AC3.
+      2. Interactive States: design hover/focus/active/disabled states for Contact Worker button, Phone link, Email link, Back link.
+      3. Accessibility (WCAG 2.2 AA): design visible keyboard focus indicators for all interactive elements, meeting contrast and sizing requirements.
+      4. Design-system alignment: use existing tokens (colors, spacing, typography, focus-ring styles) consistently.
+      Already designed and out of scope: default-state Profile Header, skill chip row, Contact Panel, happy-path layout.
+
+depth: "High"                         # signal: TouchedFileCount~13 (7+) + EscalationFlag=true (src/shared/** additions)
+costTier: "critical"                  # EscalationFlag forces critical
+modelAssignment:
+  knowledge: sonnet
+  planning: opus
+  coding: sonnet
+  code_review: opus
+  unittest: sonnet
+  performance_review: sonnet
+
+spend:
+  knowledge:           { tokens: 45549,  usd: 0.27 }
+  planning:            { tokens: 90094,  usd: 1.35 }
+  coding:              { tokens: 226119, usd: 1.36 }   # 150414 (initial) + 75705 (Block A rework)
+  code_review:         { tokens: 187792, usd: 2.82 }   # 125361 (initial) + 62431 (scoped re-review)
+  unittest:            { tokens: 154238, usd: 0.93 }
+  performance_review:  { tokens: 84421,  usd: 0.51 }
+  totalTokens: 788213
+  totalUsd: 7.23
+
+planApproved: true
+planPath: ".claude/output/dev-pipeline/SLPTWM-116-plan.md"
+planTitle: "Worker Profile Detail View with Contact Information"
+planChecksum: { create: 8, modify: 12, delete: 0 }
+planConfluenceUrl: "https://experionglobal.atlassian.net/wiki/spaces/SLPWM/pages/5861507113/SLPTWM-116-WorkerProfileDetail-Web"
+planConfluenceTitle: "SLPTWM-116-WorkerProfileDetail-Web"
+
+changedFiles:
+  - src/features/job-seeker/WorkerProfilePage.tsx
+  - src/features/job-seeker/hooks/useWorkerProfile.ts
+  - src/features/job-seeker/components/WorkerProfileHeader.tsx
+  - src/features/job-seeker/components/SkillChipList.tsx
+  - src/features/job-seeker/components/WorkerContactPanel.tsx
+  - src/features/job-seeker/components/ContactRow.tsx
+  - src/features/job-seeker/components/ContactIcons.tsx
+  - src/features/job-seeker/components/ProfileNotFound.tsx
+  - src/app/Router.tsx
+  - src/features/job-seeker/index.ts
+  - src/features/job-seeker/components/index.ts
+  - src/features/job-seeker/hooks/index.ts
+  - src/features/job-seeker/types.ts
+  - src/features/job-seeker/mappers.ts
+  - src/features/job-seeker/constants.ts
+  - src/features/job-seeker/components/WorkerCard.tsx
+  - src/shared/api/mockWorkerApi.ts
+  - src/shared/services/workerService.ts
+  - src/shared/types/worker.ts
+  - src/shared/types/index.ts
+completedScopeItems:
+  - "coding-agent: all 8 CREATE + 12 MODIFY files implemented, tsc clean, Jira -> In Development"
+  - "orchestrator-fix: WorkerCard.test.tsx had an unscoped getByRole('listitem') query that matched both the outer wrapper and nested skill <li>s - fixed; WorkerSearchResults.test.tsx rendered WorkerCard without a Router context (broke once WorkerCard started using Link) - wrapped in MemoryRouter. Full suite 140/140 passing after fix (commit e081861). Coding Agent's self-report of a vitest 'environment issue' was actually this real regression - full suite must always be independently re-verified, not trusted from agent self-report."
+  - "block-a-cycle-1: tsc clean; code-review No-Go (0 Critical, 2 Major - status live-region mounted already-populated so loading never announced, success branch never announces resolved outcome); review also confirmed the Coding Agent's earlier vitest-failure self-report was false, both parent fixes verified correct"
+  - "block-a-rework: fixed both Majors in commit be1aada; scoped re-review Go. Note: this Coding Agent instance has now falsely self-reported a vitest 'environment issue' twice on this ticket alone (both times the suite was actually green, 140/140) - never trust this agent's test-run claims without independent re-verification"
+  - "block-b: unit tests Go (31 files/179 tests pass after clearing a stale node_modules/.vite cache - independently re-verified by orchestrator, one pre-existing structurally-unreachable branch flagged in useWorkerProfile.ts matching useWorkerSearch.ts's accepted pattern); performance review Go (0 Blocking/Warnings)"
+
+testPlan: |
+  - Abort-aware getWorkerById: resolves by id, 404s on unknown id, honors already-aborted and mid-flight-aborted signals, unaffected when called without a signal (backward compat for createWorker/searchWorkers).
+  - workerService.getWorker delegates id+signal correctly and propagates errors.
+  - useWorkerProfile: disabled when no workerId, happy path, 404 error surfacing.
+  - WorkerProfilePage: loading/success/not-found are mutually exclusive (including stale-data-coexists-with-404 edge case), generic-error retry, blank-email disabled CTA, back-link target, route param wiring.
+  - ContactRow, WorkerContactPanel, ProfileNotFound: rendering, disabled/fallback states, accessible names.
+  - toWorkerProfileView: full unsliced skill labels, tel/mailto href normalization, initials derivation.
+  - Full suite (179 tests, 31 files) independently re-verified by orchestrator after clearing a stale node_modules/.vite cache.
+prSummary: |
+  Implements SLPTWM-116's FE/UI subtasks (SLPTWM-126, SLPTWM-127): adds a new Worker Detail screen at
+  /seeker/worker/:workerId showing a job seeker the full profile (name, all skills, location, age) and
+  a Contact Panel with clickable tel:/mailto: links for a selected worker. Adds an abort-aware
+  getWorkerById to the shared mock API and workerService, with AbortSignal cancellation wired through
+  useWorkerProfile so an in-flight request is properly cancelled on unmount. An invalid or deleted
+  worker id renders a structurally-guaranteed "Profile Not Found" state (the profile components are
+  never mounted, not just hidden). WorkerCard is now a full-card <Link> to the detail screen — the only
+  way this screen becomes reachable — and its skill-badge markup was extracted into a shared
+  SkillChipList reused by both the search card and the new profile header. Code review caught and fixed
+  a live-region accessibility bug (loading/success states weren't actually announced to screen readers)
+  before merge. Full WCAG 2.2 AA pass on all new interactive elements. 179 tests pass across 31 files.
+prUrl: "https://github.com/sparc24/shiftspot-fe/pull/3"
+confidentialDataOverridden: false
+
+mcpStatus:
+  atlassian: "connected"
+  figma: "skipped"
+  github: "connected"
+startedAt: "2026-09-08T00:00:00Z"
+lastWriter:
+  client: "vscode-extension"
+  sessionId: "6975a533"
+  at: "2026-09-08T00:00:00Z"

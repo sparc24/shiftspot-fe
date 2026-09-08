@@ -7,4 +7,4 @@ export type {
   WorkerRegistrationPayload,
   WorkerSearchFilters,
 } from './worker'
-export { SKILL_IDS, SKILL_OPTIONS } from './worker'
+export { SKILL_IDS, SKILL_OPTIONS, WORKER_NOT_FOUND } from './worker'

@@ -1,50 +1,40 @@
+import { Link } from 'react-router-dom'
+
 import type { WorkerCardView } from '../types'
+import { SkillChipList } from './SkillChipList'
 
 interface WorkerCardProps {
   worker: WorkerCardView
 }
 
-interface SkillBadgeProps {
-  label: string
-}
-
-function SkillBadge({ label }: SkillBadgeProps) {
-  return (
-    <li className="inline-flex items-center rounded-full bg-brand-amber-bg px-3 py-1 text-xs font-semibold text-brand-navy">
-      {label}
-    </li>
-  )
-}
-
+// The whole card is one link so its surface is a single tab stop and the
+// route is reachable at all (plan Q2). role="listitem" moves to this wrapper
+// so the anchor's accessible name is the full card text.
 export function WorkerCard({ worker }: WorkerCardProps) {
   return (
-    <div
-      role="listitem"
-      className="flex flex-col gap-3 rounded-lg border border-brand-border bg-white p-4 shadow-sm"
-    >
-      <div className="flex items-center gap-3">
-        <span
-          aria-hidden="true"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-white"
-        >
-          {worker.initials}
-        </span>
-        <div className="min-w-0">
-          <h3 className="truncate font-serif text-base font-bold text-brand-navy">{worker.name}</h3>
-          <p className="truncate text-sm text-brand-muted">
-            <span className="sr-only">Location: </span>
-            {worker.location}
-          </p>
+    <div role="listitem">
+      <Link
+        to={`/seeker/worker/${encodeURIComponent(worker.id)}`}
+        className="flex flex-col gap-3 rounded-lg border border-brand-border bg-white p-4 shadow-sm transition-shadow hover:shadow-md hover:border-brand-navy/20 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-navy active:shadow-sm"
+      >
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-white"
+          >
+            {worker.initials}
+          </span>
+          <div className="min-w-0">
+            <h3 className="truncate font-serif text-base font-bold text-brand-navy">{worker.name}</h3>
+            <p className="truncate text-sm text-brand-muted">
+              <span className="sr-only">Location: </span>
+              {worker.location}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {worker.skillLabels.length > 0 ? (
-        <ul role="list" aria-label="Skills" className="flex flex-wrap gap-1.5">
-          {worker.skillLabels.map((label) => (
-            <SkillBadge key={label} label={label} />
-          ))}
-        </ul>
-      ) : null}
+        <SkillChipList labels={worker.skillLabels} ariaLabel="Skills" size="sm" />
+      </Link>
     </div>
   )
 }
