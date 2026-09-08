@@ -10,7 +10,7 @@ import { useWorkerSearch } from './hooks'
 export function JobSeekerSearchPage() {
   const [appliedFilters, setAppliedFilters] = useState<WorkerSearchFilters | null>(null)
 
-  const { data, isLoading, isError, error, refetch } = useWorkerSearch(appliedFilters)
+  const { data, isFetching, isError, error, refetch } = useWorkerSearch(appliedFilters)
 
   const handleSearch = useCallback((filters: WorkerSearchFilters) => {
     setAppliedFilters(filters)
@@ -42,13 +42,13 @@ export function JobSeekerSearchPage() {
           </h1>
 
           <div className="mx-auto mt-8">
-            <WorkerSearchFilterBar onSearch={handleSearch} isSearching={isLoading} />
+            <WorkerSearchFilterBar onSearch={handleSearch} isSearching={isFetching} />
           </div>
 
           <div className="mt-8">
             <WorkerSearchResults
               hasSearched={appliedFilters !== null}
-              isLoading={isLoading}
+              isLoading={isFetching}
               isError={isError}
               errorMessage={error?.message}
               workers={data ?? []}

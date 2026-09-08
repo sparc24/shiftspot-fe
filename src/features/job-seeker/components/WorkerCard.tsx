@@ -39,8 +39,7 @@ export function WorkerCard({ worker }: WorkerCardProps) {
       </div>
 
       {worker.skillLabels.length > 0 ? (
-        <ul className="flex flex-wrap gap-1.5">
-          <span className="sr-only">Skills</span>
+        <ul role="list" aria-label="Skills" className="flex flex-wrap gap-1.5">
           {worker.skillLabels.map((label) => (
             <SkillBadge key={label} label={label} />
           ))}
