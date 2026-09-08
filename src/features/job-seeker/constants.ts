@@ -19,3 +19,13 @@ export const MAX_SEARCH_AGE = 70
 export function formatResultCount(count: number): string {
   return `${count} ${count === 1 ? 'worker' : 'workers'} found`
 }
+
+/** AC3 — verbatim from the acceptance criterion. */
+export const PROFILE_NOT_FOUND_TITLE = 'Profile Not Found'
+export const PROFILE_NOT_FOUND_DESCRIPTION =
+  'This worker profile is no longer available. It may have been removed, or the link may be out of date.'
+export const PROFILE_LOADING_MESSAGE = 'Loading worker profile…'
+export const PROFILE_ERROR_MESSAGE = "We couldn't load this profile right now. Please try again."
+export const BACK_TO_SEARCH_LABEL = 'Back to search results'
+export const CONTACT_WORKER_LABEL = 'Contact Worker'
+export const CONTACT_UNAVAILABLE_HINT = 'This worker has not provided an email address.'
