@@ -25,7 +25,7 @@ Resumes a task without needing to re-paste the original Jira/Figma link — just
        Completed:    <completedSteps, comma-separated>
        Branch:       <branchName>  (parent: <parentBranch>)
        Depth:        <depth>   CostTier: <costTier>
-       Last updated: <lastUpdatedAt>
+       Last updated: <lastWriter.at>  (by <lastWriter.client>)
      ```
 3. Then follow the **Resume Check** procedure in `CLAUDE.md` Step 0 exactly — git state recovery (rebase-abort-if-needed, fetch, checkout, dirty-tree check), skip only what's in `completedSteps`, jump to `currentStep`, and re-hydrate the plan from `planPath`/`planConfluenceUrl` if resuming at or after `coding-agent`. This command does not reimplement that logic — it is the same Resume Check, just entered by ticket ID instead of by re-pasting the link.
 

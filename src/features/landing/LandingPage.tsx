@@ -2,15 +2,6 @@ import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/shared/components'
 
-function CardCornerAccent() {
-  return (
-    <div
-      aria-hidden="true"
-      className="absolute right-0 top-0 h-0 w-0 border-l-[18px] border-t-[18px] border-l-transparent border-t-brand-border"
-    />
-  )
-}
-
 export function LandingPage() {
   const navigate = useNavigate()
 
@@ -40,8 +31,7 @@ export function LandingPage() {
         </p>
 
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="relative overflow-hidden rounded-lg border border-brand-border bg-white p-6 shadow-sm">
-            <CardCornerAccent />
+          <div className="notch-panel relative bg-white p-7 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-brand-amber">For workers</p>
             <h2 className="mt-1 font-serif text-xl font-bold text-brand-navy">List your skills</h2>
             <p className="mt-2 text-sm text-brand-muted">
@@ -51,14 +41,13 @@ export function LandingPage() {
             <Button
               variant="dark"
               onClick={() => navigate('/worker/register')}
-              className="mt-5 w-full"
+              className="notch-btn mt-8 w-full !rounded-none"
             >
               Act as a Worker
             </Button>
           </div>
 
-          <div className="relative overflow-hidden rounded-lg border border-brand-border bg-white p-6 shadow-sm">
-            <CardCornerAccent />
+          <div className="notch-panel relative bg-white p-7 shadow-sm">
             <p className="text-xs font-bold uppercase tracking-wide text-brand-amber">
               For job seekers
             </p>
@@ -70,7 +59,7 @@ export function LandingPage() {
             <Button
               variant="outline-dark"
               onClick={() => navigate('/seeker/search')}
-              className="mt-5 w-full"
+              className="notch-btn notch-btn-outline relative mt-8 w-full !rounded-none !border-0"
             >
               Act as a Job Seeker
             </Button>

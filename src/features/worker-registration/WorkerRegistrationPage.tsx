@@ -6,6 +6,18 @@ import type { WorkerRegistrationFormValues } from '@/shared/validation'
 
 import { WorkerRegistrationForm } from './WorkerRegistrationForm'
 
+// The Penpot "Corner Clip" layer: the form card is a plain rounded rectangle
+// decorated with a small page-background-colored dog-ear at its top-right
+// corner (not a full clipped-corner silhouette like the landing page cards).
+function CardCornerFold() {
+  return (
+    <div
+      aria-hidden="true"
+      className="absolute right-0 top-0 h-0 w-0 border-l-[28px] border-t-[28px] border-l-transparent border-t-brand-bg"
+    />
+  )
+}
+
 export function WorkerRegistrationPage() {
   const mutation = useWorkerRegistration()
 
@@ -44,29 +56,35 @@ export function WorkerRegistrationPage() {
             </h1>
 
             {bannerMessage ? (
-              <div role="alert" className="mx-auto mt-6 max-w-xl rounded-lg border border-brand-amber bg-brand-amber-bg p-4">
+              <div role="alert" className="relative mx-auto mt-6 max-w-xl overflow-hidden rounded-[10px] bg-brand-amber-bg p-4 pl-5">
+                <span aria-hidden="true" className="absolute inset-y-4 left-0 w-1 rounded-full bg-brand-amber" />
                 <div className="flex items-start gap-3">
                   <span
                     aria-hidden="true"
-                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-amber text-sm font-bold text-white"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-amber text-sm font-bold text-white"
                   >
                     !
                   </span>
                   <div>
                     <p className="font-semibold text-brand-navy">Profile already exists</p>
-                    <p className="mt-1 text-sm text-brand-navy/80">{bannerMessage}</p>
+                    <p className="mt-1 text-sm text-brand-muted">{bannerMessage}</p>
                   </div>
                 </div>
               </div>
             ) : null}
 
             <div className="mx-auto mt-8 max-w-xl">
-              <div className="rounded-2xl border border-brand-border bg-white p-8 shadow-sm">
-                <WorkerRegistrationForm
-                  onSubmit={handleSubmit}
-                  isSubmitting={mutation.isPending}
-                  serverFieldErrors={mutation.isError ? mutation.error.fieldErrors : undefined}
-                />
+              <div className="relative">
+                <div className="overflow-hidden rounded-[14px] border border-brand-border bg-white p-8 shadow-sm">
+                  <WorkerRegistrationForm
+                    onSubmit={handleSubmit}
+                    isSubmitting={mutation.isPending}
+                    serverFieldErrors={mutation.isError ? mutation.error.fieldErrors : undefined}
+                  />
+                </div>
+                {/* Positioned in a border-less wrapper so it overlaps the card's border/rounded
+                    corner rather than sitting inside its padding box (see CardCornerFold). */}
+                <CardCornerFold />
               </div>
 
               <aside className="mt-6 rounded-lg border border-brand-border bg-white p-5 shadow-sm">

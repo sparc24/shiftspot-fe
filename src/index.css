@@ -13,3 +13,59 @@
     @apply outline-none ring-2 ring-offset-2 ring-brand-navy;
   }
 }
+
+/*
+ * Clipped top-right corner ("notch") shapes used by the landing page cards and
+ * CTA buttons in the approved Penpot design. clip-path alone would silently
+ * drop the border along the diagonal edge, so the ::before pseudo-element
+ * re-draws a border ring of uniform width around the *same* clip-path using
+ * the padding-box/content-box mask-composite trick — this works for any
+ * polygon, not just rectangles, which is exactly the case here.
+ */
+@layer components {
+  .notch-panel {
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%);
+  }
+  .notch-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    clip-path: inherit;
+    background: theme('colors.brand.border');
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .notch-btn {
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  }
+  .notch-btn-outline {
+    position: relative;
+  }
+  .notch-btn-outline::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1.5px;
+    clip-path: inherit;
+    background: theme('colors.brand.navy');
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
