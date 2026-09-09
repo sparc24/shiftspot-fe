@@ -1,0 +1,116 @@
+ticketId: "SLPTWM-129"
+workflowType: "full"
+currentStep: "jira-done"
+completedSteps:
+  - parent-branch-selection
+  - task-classification
+  - knowledge-agent
+  - task-signals
+  - planning-agent
+  - plan-approval
+  - coding-agent
+  - block-a
+  - block-b
+  - rebase-health
+parentBranch: "develop"
+branchName: "feature/SLPTWM-129-worker-api-integration"
+diverged: false
+
+issueType: "Sub-task"
+storyPoints: null
+feSubtasks:
+  - key: "SLPTWM-129"
+    summary: "FE-API integration"
+    status: "To Do"
+    description: |
+      URL: http://be-shiftspot-dev.eba-yhbmy8j2.ap-south-1.elasticbeanstalk.com
+      Endpoint: POST /api/v1/workers
+      Expected Payload:
+      {
+        "name": "string",
+        "email": "string",
+        "phoneNumber": "string",
+        "location": "string",
+        "age": 0,
+        "skills": ["string"]
+      }
+
+depth: "High"                         # signal: TouchedFileCount=7-9 (7+) + EscalationFlag=true (src/shared/** changes)
+costTier: "critical"                  # EscalationFlag forces critical
+modelAssignment:
+  knowledge: sonnet
+  planning: opus
+  coding: sonnet
+  code_review: opus
+  unittest: sonnet
+  performance_review: sonnet
+
+spend:
+  knowledge:           { tokens: 45776,  usd: 0.27 }
+  planning:            { tokens: 81214,  usd: 1.22 }
+  coding:              { tokens: 213156, usd: 1.28 }   # 134391 (initial) + 78765 (Block A rework)
+  code_review:         { tokens: 200042, usd: 3.00 }   # 130653 (initial) + 69389 (scoped re-review)
+  unittest:            { tokens: 166529, usd: 1.00 }
+  performance_review:  { tokens: 83399,  usd: 0.50 }
+  totalTokens: 790116
+  totalUsd: 7.27
+
+planApproved: true
+planPath: ".claude/output/dev-pipeline/SLPTWM-129-plan.md"
+planTitle: "FE-API integration - replace mock worker registration with live POST /api/v1/workers"
+planChecksum: { create: 3, modify: 7, delete: 0 }
+planConfluenceUrl: "https://experionglobal.atlassian.net/wiki/spaces/SLPWM/pages/5863473157/SLPTWM-129-FEApiIntegration-Web"
+planConfluenceTitle: "SLPTWM-129-FEApiIntegration-Web"
+
+changedFiles:
+  - src/shared/api/workerApi.ts
+  - src/shared/types/worker.ts
+  - src/shared/types/index.ts
+  - src/shared/api/client.ts
+  - src/shared/api/index.ts
+  - src/shared/services/workerService.ts
+  - vite.config.ts
+  - .env.example
+  - src/features/worker-registration/WorkerRegistrationPage.tsx
+  - src/features/worker-registration/WorkerRegistrationForm.tsx
+completedScopeItems:
+  - "coding-agent: all 3 CREATE + 7 MODIFY items implemented across 4 commits, tsc clean, Jira -> In Progress, .env confirmed never staged (gitignored)"
+  - "orchestrator-verify: independently re-ran full suite after clearing stale node_modules/.vite cache - 6 failures in workerService.test.ts are EXPECTED (plan explicitly flags this file for Unit Test Agent rewrite, since it still asserts old mock-based duplicate behavior pre-swap), not a Coding Agent defect"
+  - "MAJOR PROCESS FINDING: bare `npx tsc --noEmit` silently checks NOTHING in this repo (root tsconfig.json is a project-references file with files:[]) - verified by injecting a deliberate type error and confirming bare tsc still exits 0. Every 'tsc clean' claim across every prior ticket in this pipeline (SLPTWM-115, 116, 129, footer, penpot) used this broken command. Fixed to `tsc --build --noEmit` in CLAUDE.md/coding-agent.md/code-review-agent.md (develop commit b1fb442), rebased into this branch. Re-verified SLPTWM-129 with the correct command: still clean."
+  - "block-a-cycle-1: tsc (correct --build form) clean; code-review No-Go (0 Critical, 1 Major - hardcoded duplicate-banner heading misleads on non-duplicate failures - plus 6 Minor)"
+  - "block-a-rework: fixed the Major + 3 Minors in commit fc61f7d; scoped re-review Go, tsc --build --noEmit clean"
+  - "block-b: unit tests Go (35 files/232 tests pass, 97-100% coverage on changed files; independently re-verified by orchestrator); performance review Go (0 Blocking/Warnings)"
+
+testPlan: |
+  - workerApi request mapping: phone->phoneNumber rename, skill id->Title-Case label mapping, numeric age passthrough.
+  - workerApi response mapping: tolerant fallback to submitted payload for empty/partial/null DTO fields, empty-string name handling, missing id->''.
+  - 409 duplicate detection ladder: email/phone/mobile/contact-number keyword matching, both-fields match, indeterminate fallback (flags both).
+  - 400 and network errors pass through unchanged, never treated as duplicates.
+  - client.ts interceptor: RFC7807 detail/title normalization, legacy code/message back-compat, status population, non-JSON body safety, success passthrough.
+  - workerService.createWorker delegates to workerApi (resolve + reject); searchWorkers/getWorker regression-confirmed unchanged.
+  - WorkerRegistrationPage: non-duplicate banner heading regression lock-in (the Major fix from code review).
+  - WorkerRegistrationForm: server-error focus management (email priority, phone fallback, no-op when absent).
+  - Full suite (232 tests, 35 files) independently re-verified by orchestrator.
+prSummary: |
+  Implements SLPTWM-129: replaces the mock worker-registration API with a live POST /api/v1/workers call,
+  translating the request/response shape at a new workerApi.ts boundary and reproducing the existing
+  duplicate-profile UX from the backend's RFC7807 409 responses. Adds a ProblemDetails-aware response
+  interceptor to the shared apiClient, widens Worker/ApiError types additively (createdAt optional, new
+  status field), and adds a Vite dev-proxy workaround since the backend currently sends no CORS headers.
+  Several facts undocumented in the ticket were resolved by probing the live backend during planning
+  (skills are sent as Title-Case labels, not lowercase ids; no createdAt in the response; no auth required
+  yet despite the OpenAPI spec declaring it). Code review caught and fixed a banner bug where non-duplicate
+  failures (network/400/5xx) incorrectly showed "Profile already exists" instead of a generic failure
+  message. 232 tests pass with 97-100% coverage on every changed file.
+prUrl: ""
+confidentialDataOverridden: false
+
+mcpStatus:
+  atlassian: "connected"
+  figma: "skipped"
+  github: "connected"
+startedAt: "2026-09-09T00:00:00Z"
+lastWriter:
+  client: "vscode-extension"
+  sessionId: "6975a533"
+  at: "2026-09-09T00:00:00Z"
