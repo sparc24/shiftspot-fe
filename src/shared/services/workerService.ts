@@ -1,12 +1,12 @@
 import { mockWorkerApi } from '@/shared/api/mockWorkerApi'
+import { workerApi } from '@/shared/api/workerApi'
 import type { Worker, WorkerRegistrationPayload, WorkerSearchFilters } from '@/shared/types'
 
-// Single swap point: today this delegates to the in-memory mock. Swapping to a
-// live endpoint is a one-function-body change:
-//   const { data } = await apiClient.post<Worker>('/api/workers', payload)
-//   return data
+// Live endpoint (SLPTWM-129): delegates to workerApi, which POSTs to
+// /api/v1/workers through the shared apiClient and maps the request/response
+// shape at the boundary (see src/shared/api/workerApi.ts).
 async function createWorker(payload: WorkerRegistrationPayload): Promise<Worker> {
-  return mockWorkerApi.createWorker(payload)
+  return workerApi.createWorker(payload)
 }
 
 // Single swap point: today this delegates to the in-memory mock. Swapping to a
