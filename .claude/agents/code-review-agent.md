@@ -219,7 +219,7 @@ If you spot a pattern owned by Performance Review, do **not** assign it a severi
 
 ## Behavior
 
-**Concurrency note:** the Orchestrator invokes this agent in the same message as a plain `npx tsc --noEmit` Bash call (an "Impact Check") — the two run in parallel, not sequentially. Review the code exactly as if running alone: do not wait for, reference, or condition anything on the Impact Check's output, because it does not exist on this agent's path. The **Orchestrator** merges the two results after both return, folding any `tsc` error into this report's Critical section as `[Impact Check] <file>:<line> — <tsc error>`.
+**Concurrency note:** the Orchestrator invokes this agent in the same message as a `npx tsc --build --noEmit` Bash call (an "Impact Check") — the two run in parallel, not sequentially. Review the code exactly as if running alone: do not wait for, reference, or condition anything on the Impact Check's output, because it does not exist on this agent's path. The **Orchestrator** merges the two results after both return, folding any `tsc` error into this report's Critical section as `[Impact Check] <file>:<line> — <tsc error>`. (Note the `--build` flag: this project's root `tsconfig.json` is a project-references file with `"files": []`, so a bare `tsc --noEmit` checks nothing and exits 0 unconditionally — if you independently spot-check compilation for anything you review, use `--build` too, never the bare form.)
 
 1. Read the approved plan from conversation context (or from `planPath` in the state file, if resuming) and extract the Plan Checksum from Section 2
 2. Enumerate the actually-changed files with **Bash**, not Glob — `Glob` matches filename patterns and has no notion of a diff, so it cannot answer "what changed":

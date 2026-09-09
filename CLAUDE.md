@@ -130,7 +130,7 @@ Step 2 — Assess Task Signals (Depth + CostTier)
                         spend.coding now — before Block A starts]
      ┌────────────────────────────────────────────────┐
      │ Step 3a — PARALLEL BLOCK A (one message)        │
-     │ [Notify: Started] Bash: npx tsc --noEmit        │
+     │ [Notify: Started] Bash: npx tsc --build --noEmit │
      │ Agent: Code Review Agent (depth-scaled)         │
      └─────────────────────┬────────────────────────────┘
                             ↓ Orchestrator merges: any tsc error → Critical
@@ -458,8 +458,10 @@ The Skill returns the resolved per-agent model map for this `CostTier` (from `.c
 
 Runs once the Coding Agent reports complete. The Orchestrator issues both in the **same message** so they run concurrently:
 
-- **Bash:** `npx tsc --noEmit` (the "Impact Check" — mechanical, no LLM reasoning)
+- **Bash:** `npx tsc --build --noEmit` (the "Impact Check" — mechanical, no LLM reasoning)
 - **Agent:** Code Review Agent, at the assigned Depth and model
+
+**This project's root `tsconfig.json` is a project-references solution file (`"files": []`, `references: [...]`) — a bare `npx tsc --noEmit` silently checks nothing and exits 0 even with real type errors present.** Verified directly: injecting a deliberate type error into `src/main.tsx` and running bare `tsc --noEmit` still exits 0, while `tsc --build --noEmit` (or `-p tsconfig.app.json` for app-only) correctly reports it. Every "Impact Check" run with the bare command before this was fixed was a no-op, not a passed check — `--build` (`-b`) is what actually walks the reference graph and checks every project, including `tsconfig.node.json` (which covers `vite.config.ts`). **Never invoke this check without `--build`/`-b` in this repo.**
 
 The Impact Check is deliberately the **full, non-incremental** project check, including test files. The Coding Agent's per-step checks use `--incremental` for speed and may not cover everything; this is the authoritative one, and it's free wall-clock because it runs concurrently with the Code Review Agent rather than before it.
 
@@ -537,7 +539,7 @@ while a rebase is in progress:
 
 **4.4 — Re-verify after *any* resolution, automatic or human.** "Keeping both additions" is not automatically build-safe: two sides adding the same export name to an `index.ts`, or the same path to a router array, yields a duplicate-identifier `tsc` error or a silently shadowed route. Run both:
 ```bash
-npx tsc --noEmit
+npx tsc --build --noEmit
 ```
 plus the scoped test command from `unittest-agent.md` — scoped to **`origin/<ParentBranch>`**, not the local ref, which is now behind the rebase target. If either fails, this is a regression introduced by the rebase: gate to the user rather than opening a PR.
 

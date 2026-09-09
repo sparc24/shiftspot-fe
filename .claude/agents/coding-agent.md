@@ -322,7 +322,7 @@ If there's no ticket, omit the scope: `feat: add loading spinner component`.
 
 - **Never `git commit --no-verify`.** If a pre-commit/lint hook fails, fix the underlying issue and re-commit — do not bypass it.
 - **Never squash the incremental history into one commit before pushing.** The GitHub PR Skill pushes the branch as-is; the incremental history is useful to reviewers.
-- Each commit should leave the codebase in a state that at least type-checks (`tsc --noEmit` clean) — don't commit deliberately broken intermediate states.
+- Each commit should leave the codebase in a state that at least type-checks (`tsc --build --noEmit` clean — the bare `--noEmit` form checks nothing in this repo, see below) — don't commit deliberately broken intermediate states.
 
 ---
 
@@ -353,11 +353,11 @@ After all three PRE-CONDITIONS gates are cleared. **In Bypass Workflow, there is
 5. Work through the Scope of Change row by row, grouped by implementation step (types → schemas → services → hooks → components → routes) — report each completed item back to the Orchestrator in the conversation
 6. Use **Edit** to modify existing files — prefer editing over rewriting
 7. Use **Write** only when creating new files listed in the plan
-8. Use **Bash** to type-check after each implementation step, before committing it — **use the incremental form**, since this runs once per step and a cold full check on a large project is the most expensive repeated call in the pipeline:
+8. Use **Bash** to type-check after each implementation step, before committing it:
    ```bash
-   npx tsc --noEmit --incremental
+   npx tsc --build --noEmit
    ```
-   The first run builds `.tsbuildinfo`; every subsequent step reuses it and only re-checks what changed. Add `*.tsbuildinfo` to `.gitignore` if it isn't already — an untracked artifact here would block Step 4's rebase (see `CLAUDE.md` Step 4.1). The authoritative **full, non-incremental** check is Block A's Impact Check, which runs once at the end.
+   **This project's root `tsconfig.json` is a project-references solution file (`"files": []`) — a bare `npx tsc --noEmit`, with or without `--incremental`, silently type-checks nothing and exits 0 even with real errors present.** Verified directly by injecting a deliberate type error and confirming the bare form still exits 0 while `--build` reports it. `--build` (`-b`) is not optional here — it is what walks the reference graph (`tsconfig.app.json` + `tsconfig.node.json`, so `vite.config.ts` is covered too) and actually checks something. Each project already has its own `tsBuildInfoFile` configured, so `--build` mode caches incrementally on its own — no separate `--incremental` flag is needed or supported alongside `--build`. `*.tsbuildinfo` output paths already live under `node_modules/.tmp/`, so they're gitignored by the existing `node_modules/` ignore — confirm this holds if a project's `tsBuildInfoFile` path ever changes. The authoritative **full** check is Block A's Impact Check, which runs the same command once at the end — "full" here just means "after all steps," since `--build` mode doesn't have a partial/non-partial distinction the way ad-hoc `--incremental` did.
 9. After each implementation step passes the type check, **commit it** per the Commit Standards above (`git add <files for this step> && git commit -m "<type>(<TicketId>): <description>"`) — do not batch multiple steps into one commit, and never pass `--no-verify`
 10. Report a summary to the Orchestrator: files created/modified, the commits made, any deviations from the plan, and any assumptions made
 
@@ -370,7 +370,7 @@ After all three PRE-CONDITIONS gates are cleared. **In Bypass Workflow, there is
 | Read | Understand existing components, hooks, and services before modifying |
 | Write | Create new files in scope — listed in the approved plan (Full) or required by the Bypass task (Bypass) |
 | Edit | Modify existing files precisely |
-| Bash | Run `tsc --noEmit`, lint, or dev build to verify changes |
+| Bash | Run `tsc --build --noEmit` (never bare `tsc --noEmit` — see above), lint, or dev build to verify changes |
 | Glob | Find components, hooks, service files, and type files by pattern |
 | Grep | Search for component names, hook usages, store slices, and query keys |
 
