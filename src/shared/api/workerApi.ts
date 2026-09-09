@@ -83,7 +83,10 @@ function toSkillIds(skills: string[] | null | undefined): WorkerRegistrationPayl
 function toWorker(dto: WorkerDto | undefined, submitted: WorkerRegistrationPayload): Worker {
   return {
     id: dto?.id ?? '',
-    name: dto?.name ?? submitted.name,
+    // `||`, not `??`: a 201 body of `{ name: "" }` is falsy-but-defined, and the
+    // plan's guarantee (§9) is that `name` is always a non-empty string so the
+    // success screen can never render "Thanks, !".
+    name: dto?.name || submitted.name,
     email: dto?.email ?? submitted.email,
     phone: dto?.phoneNumber ?? submitted.phone,
     location: dto?.location ?? submitted.location,
@@ -91,6 +94,16 @@ function toWorker(dto: WorkerDto | undefined, submitted: WorkerRegistrationPaylo
     skills: toSkillIds(dto?.skills) ?? submitted.skills,
     // createdAt intentionally omitted — the backend does not provide one.
   }
+}
+
+// Narrow guard for the `error as ApiError` cast below: apiClient's response
+// interceptor (client.ts) normalizes every rejection that actually goes
+// through it into this shape, but the try block here also wraps
+// toCreateWorkerRequest(payload) — a raw error thrown there (e.g. a TypeError
+// from unexpected input) never touches the interceptor and would otherwise be
+// silently mistreated as an already-normalized ApiError.
+function isApiError(error: unknown): error is ApiError {
+  return typeof error === 'object' && error !== null && 'code' in error && 'message' in error
 }
 
 // 409 -> duplicate ApiError with code/field/fieldErrors reproducing the mock's
@@ -131,7 +144,10 @@ async function createWorker(payload: WorkerRegistrationPayload): Promise<Worker>
     const { data } = await apiClient.post<WorkerDto>(WORKERS_PATH, toCreateWorkerRequest(payload))
     return toWorker(data, payload)
   } catch (error) {
-    return Promise.reject(toWorkerCreationError(error as ApiError))
+    if (!isApiError(error)) {
+      return Promise.reject(error)
+    }
+    return Promise.reject(toWorkerCreationError(error))
   }
 }
 
