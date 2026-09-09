@@ -53,4 +53,36 @@ describe('LandingPage', () => {
 
     expect(await screen.findByText('Job Seeker Screen')).toBeInTheDocument()
   })
+
+  // Penpot design-alignment regression guard (commit cc5d423): the outline
+  // button's notch-cut corner previously relied on a single-element
+  // .notch-btn-outline + ::before mask-composite technique that did not
+  // reliably render. It was replaced with a wrapper <div> carrying the outer
+  // navy notch shape (.notch-btn-outline-frame) around the inner Button,
+  // which reuses .notch-btn for the inner white notch shape. These are
+  // structural class checks, not a CSS-rendering test — jsdom can't verify
+  // clip-path/mask-composite visually.
+  it('LandingPage_actAsJobSeekerButton_isWrappedInNotchOutlineFrameWithNotchBtnInner', () => {
+    render(
+      <MemoryRouter>
+        <LandingPage />
+      </MemoryRouter>,
+    )
+
+    const jobSeekerButton = screen.getByRole('button', { name: /act as a job seeker/i })
+    expect(jobSeekerButton).toHaveClass('notch-btn')
+    expect(jobSeekerButton.parentElement).toHaveClass('notch-btn-outline-frame')
+  })
+
+  it('LandingPage_actAsWorkerButton_usesNotchBtnDirectlyWithoutOutlineFrameWrapper', () => {
+    render(
+      <MemoryRouter>
+        <LandingPage />
+      </MemoryRouter>,
+    )
+
+    const workerButton = screen.getByRole('button', { name: /act as a worker/i })
+    expect(workerButton).toHaveClass('notch-btn')
+    expect(workerButton.parentElement).not.toHaveClass('notch-btn-outline-frame')
+  })
 })

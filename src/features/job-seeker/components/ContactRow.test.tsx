@@ -44,4 +44,21 @@ describe('ContactRow', () => {
     const icon = screen.getByTestId('row-icon')
     expect(icon.closest('[aria-hidden="true"]')).toBeInTheDocument()
   })
+
+  // Penpot design-alignment regression guard (commit 128146e): the icon
+  // badge switched from navy to amber styling.
+  it('ContactRow_withIcon_rendersIconBadgeWithAmberStylingNotNavy', () => {
+    render(
+      <ContactRow
+        label="Phone"
+        value="+91-900-000-0001"
+        href="tel:+919000000001"
+        icon={<span data-testid="row-icon">i</span>}
+      />,
+    )
+
+    const badge = screen.getByTestId('row-icon').closest('[aria-hidden="true"]')
+    expect(badge).toHaveClass('bg-brand-amber-bg', 'text-brand-amber')
+    expect(badge).not.toHaveClass('bg-brand-navy', 'text-white')
+  })
 })

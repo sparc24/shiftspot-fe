@@ -17,11 +17,11 @@ export function ContactRow({ label, value, href, icon }: ContactRowProps) {
   return (
     <a
       href={href}
-      className="group flex items-center gap-3 rounded-lg border border-brand-border bg-white px-4 py-3 transition-colors hover:bg-brand-bg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-navy active:bg-brand-border/60"
+      className="group flex items-center gap-3 rounded-lg px-1 py-1 transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-navy active:bg-white/60"
     >
       <span
         aria-hidden="true"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-navy text-white"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-amber-bg text-brand-amber"
       >
         {icon}
       </span>

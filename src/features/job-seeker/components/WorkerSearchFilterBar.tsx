@@ -39,14 +39,14 @@ export function WorkerSearchFilterBar({ onSearch, isSearching }: WorkerSearchFil
       onSubmit={handleSubmit(onSubmit)}
       noValidate
       aria-label="Worker search filters"
-      className="flex flex-col gap-4 rounded-lg border border-brand-border bg-white p-5 shadow-sm lg:flex-row lg:items-end"
+      className="flex flex-col gap-4 rounded-xl border border-brand-border bg-white p-5 shadow-sm lg:flex-row lg:items-end"
     >
       <div className="lg:flex-1">
         <Controller
           name="skills"
           control={control}
           render={({ field }) => (
-            <FormField id="skills" label="Skills" error={errors.skills?.message}>
+            <FormField id="skills" label="Skill Filter" error={errors.skills?.message}>
               <MultiSelect
                 id="skills"
                 name="skills"
@@ -66,7 +66,7 @@ export function WorkerSearchFilterBar({ onSearch, isSearching }: WorkerSearchFil
         <FormField id="location" label="Location" error={errors.location?.message}>
           <TextInput
             id="location"
-            placeholder="City, Country"
+            placeholder="e.g. New York"
             invalid={!!errors.location}
             aria-describedby={errors.location ? 'location-error' : undefined}
             {...register('location')}
@@ -79,7 +79,7 @@ export function WorkerSearchFilterBar({ onSearch, isSearching }: WorkerSearchFil
             type="text"
             inputMode="numeric"
             autoComplete="off"
-            placeholder="30"
+            placeholder="e.g. 30"
             invalid={!!errors.age}
             aria-describedby={errors.age ? 'age-error' : undefined}
             {...register('age')}
@@ -87,7 +87,12 @@ export function WorkerSearchFilterBar({ onSearch, isSearching }: WorkerSearchFil
         </FormField>
       </div>
 
-      <Button type="submit" variant="dark" isLoading={isSearching} className="w-full lg:w-auto">
+      <Button
+        type="submit"
+        variant="dark"
+        isLoading={isSearching}
+        className="notch-btn w-full !rounded-none lg:w-auto"
+      >
         Find Workers
       </Button>
     </form>

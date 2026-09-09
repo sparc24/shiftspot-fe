@@ -74,6 +74,19 @@ describe('WorkerProfilePage', () => {
       expect(screen.queryByRole('heading')).not.toBeInTheDocument()
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
+
+    // Penpot design-alignment regression guard (commit 128146e): the
+    // skeleton is now wrapped in the notch-panel card treatment (previously
+    // there was no card container around it at all).
+    it('WorkerProfilePage_whileLoading_wrapsSkeletonInNotchPanelCard', () => {
+      mockQueryResult({ isLoading: true })
+
+      renderPage()
+
+      const panel = document.querySelector('main .notch-panel')
+      expect(panel).toBeInTheDocument()
+      expect(panel?.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
+    })
   })
 
   describe('success branch', () => {
@@ -129,6 +142,19 @@ describe('WorkerProfilePage', () => {
       expect(
         screen.queryByRole('link', { name: /contact .* by email/i }),
       ).not.toBeInTheDocument()
+    })
+
+    // Penpot design-alignment regression guard (commit 128146e): the detail
+    // content is now wrapped in a notch-panel card (previously no card
+    // container existed around the profile article at all).
+    it('WorkerProfilePage_withSuccessfulFetch_wrapsArticleInNotchPanelCard', () => {
+      const worker = createWorker()
+      mockQueryResult({ data: worker })
+
+      renderPage()
+
+      const article = screen.getByRole('article')
+      expect(article).toHaveClass('notch-panel')
     })
   })
 

@@ -156,6 +156,17 @@ describe('JobSeekerSearchPage', () => {
     expect(await screen.findByText('Landing Screen')).toBeInTheDocument()
   })
 
+  // Penpot design-alignment regression guard (commit cc5d423): the page
+  // heading text was shortened from "Search for Workers" to "Search Workers".
+  it('JobSeekerSearchPage_onRender_headingTextIsExactlySearchWorkers', () => {
+    mockedUseWorkerSearch.mockReturnValue(createQueryResult())
+
+    renderPage()
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Search Workers')
+    expect(screen.queryByText('Search for Workers')).not.toBeInTheDocument()
+  })
+
   it('uses sticky-footer layout with flex wrapper and flex-1 main', () => {
     mockedUseWorkerSearch.mockReturnValue(createQueryResult())
 

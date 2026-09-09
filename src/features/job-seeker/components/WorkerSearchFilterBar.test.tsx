@@ -88,4 +88,26 @@ describe('WorkerSearchFilterBar', () => {
     expect(submitButton).toHaveAttribute('aria-busy', 'true')
     expect(submitButton).toBeDisabled()
   })
+
+  // Penpot design-alignment regression guards (commit 128146e).
+  it('WorkerSearchFilterBar_rendersSkillFilterGroupLabelNotSkills', () => {
+    render(<WorkerSearchFilterBar onSearch={vi.fn()} isSearching={false} />)
+
+    expect(screen.getByRole('group', { name: 'Skill Filter' })).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Skills' })).not.toBeInTheDocument()
+  })
+
+  it('WorkerSearchFilterBar_rendersLocationAndAgePlaceholdersMatchingApprovedCopy', () => {
+    render(<WorkerSearchFilterBar onSearch={vi.fn()} isSearching={false} />)
+
+    expect(screen.getByPlaceholderText('e.g. New York')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('e.g. 30')).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('City, Country')).not.toBeInTheDocument()
+  })
+
+  it('WorkerSearchFilterBar_rendersFindWorkersButtonWithNotchBtnClass', () => {
+    render(<WorkerSearchFilterBar onSearch={vi.fn()} isSearching={false} />)
+
+    expect(screen.getByRole('button', { name: /find workers/i })).toHaveClass('notch-btn')
+  })
 })

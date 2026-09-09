@@ -61,13 +61,18 @@ export function WorkerProfilePage() {
           </div>
 
           {isLoading ? (
-            <ProfileSkeleton />
+            <div className="notch-panel relative bg-white p-8 shadow-sm">
+              <ProfileSkeleton />
+            </div>
           ) : isNotFound ? (
             <ProfileNotFound />
           ) : isError ? (
             <ErrorAlert message={PROFILE_ERROR_MESSAGE} onRetry={handleRetry} />
           ) : profile ? (
-            <article aria-labelledby="worker-profile-name" className="flex flex-col gap-2">
+            <article
+              aria-labelledby="worker-profile-name"
+              className="notch-panel relative flex flex-col gap-2 bg-white p-8 shadow-sm"
+            >
               <WorkerProfileHeader profile={profile} />
               <WorkerContactPanel
                 phone={profile.phone}

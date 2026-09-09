@@ -79,4 +79,82 @@ describe('WorkerContactPanel', () => {
 
     expect(screen.getByText('Not provided')).toBeInTheDocument()
   })
+
+  // Penpot design-alignment regression guards (commit 128146e).
+  it('WorkerContactPanel_withPhoneAndEmail_rendersContactDetailsHeadingNotContact', () => {
+    render(
+      <WorkerContactPanel
+        phone={createRow()}
+        email={createRow({ value: 'anita.kumar@example.com', href: 'mailto:anita.kumar@example.com' })}
+        contactHref="mailto:anita.kumar@example.com"
+        workerName="Anita Kumar"
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Contact Details' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Contact' })).not.toBeInTheDocument()
+  })
+
+  it('WorkerContactPanel_withPhoneAndEmail_rendersPhoneNumberAndEmailIdLabels', () => {
+    render(
+      <WorkerContactPanel
+        phone={createRow()}
+        email={createRow({ value: 'anita.kumar@example.com', href: 'mailto:anita.kumar@example.com' })}
+        contactHref="mailto:anita.kumar@example.com"
+        workerName="Anita Kumar"
+      />,
+    )
+
+    expect(screen.getByText('Phone Number')).toBeInTheDocument()
+    expect(screen.getByText('Email ID')).toBeInTheDocument()
+    expect(screen.queryByText('Phone')).not.toBeInTheDocument()
+    expect(screen.queryByText('Email')).not.toBeInTheDocument()
+  })
+
+  it('WorkerContactPanel_withPhoneAndEmail_wrapsBothRowsInOneSharedPanelContainer', () => {
+    render(
+      <WorkerContactPanel
+        phone={createRow()}
+        email={createRow({ value: 'anita.kumar@example.com', href: 'mailto:anita.kumar@example.com' })}
+        contactHref="mailto:anita.kumar@example.com"
+        workerName="Anita Kumar"
+      />,
+    )
+
+    const phoneContainer = screen.getByText('+91-900-000-0001').closest('a')?.parentElement
+    const emailContainer = screen.getByText('anita.kumar@example.com').closest('a')?.parentElement
+
+    expect(phoneContainer).toBe(emailContainer)
+    expect(phoneContainer).toHaveClass('rounded-lg', 'border', 'border-brand-border', 'bg-brand-bg', 'p-4')
+  })
+
+  it('WorkerContactPanel_withContactHref_appliesNotchBtnAndFullWidthClassesToCtaLink', () => {
+    render(
+      <WorkerContactPanel
+        phone={createRow()}
+        email={createRow({ value: 'anita.kumar@example.com', href: 'mailto:anita.kumar@example.com' })}
+        contactHref="mailto:anita.kumar@example.com"
+        workerName="Anita Kumar"
+      />,
+    )
+
+    const cta = screen.getByRole('link', { name: 'Contact Anita Kumar by email' })
+    expect(cta).toHaveClass('notch-btn', 'w-full')
+    expect(cta).not.toHaveClass('w-fit')
+  })
+
+  it('WorkerContactPanel_withoutContactHref_appliesNotchBtnAndFullWidthClassesToDisabledButton', () => {
+    render(
+      <WorkerContactPanel
+        phone={createRow()}
+        email={createRow({ value: '', href: '' })}
+        contactHref={undefined}
+        workerName="Anita Kumar"
+      />,
+    )
+
+    const button = screen.getByRole('button', { name: 'Contact Worker' })
+    expect(button).toHaveClass('notch-btn', 'w-full')
+    expect(button).not.toHaveClass('w-fit')
+  })
 })

@@ -22,7 +22,7 @@ interface WorkerContactPanelProps {
 function ContactValueRow(props: { label: string; row: ContactRowView; icon: ReactNode }) {
   if (!props.row.value.trim()) {
     return (
-      <div className="flex items-center gap-3 rounded-lg border border-brand-border bg-white px-4 py-3">
+      <div className="flex items-center gap-3">
         <span
           aria-hidden="true"
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-border text-brand-muted"
@@ -44,25 +44,25 @@ export function WorkerContactPanel({ phone, email, contactHref, workerName }: Wo
   return (
     <section aria-labelledby="contact-heading" className="mt-8 flex flex-col gap-4">
       <h2 id="contact-heading" className="font-serif text-lg font-bold text-brand-navy">
-        Contact
+        Contact Details
       </h2>
 
-      <div className="flex flex-col gap-3">
-        <ContactValueRow label="Phone" row={phone} icon={<PhoneIcon />} />
-        <ContactValueRow label="Email" row={email} icon={<MailIcon />} />
+      <div className="flex flex-col gap-3 rounded-lg border border-brand-border bg-brand-bg p-4">
+        <ContactValueRow label="Phone Number" row={phone} icon={<PhoneIcon />} />
+        <ContactValueRow label="Email ID" row={email} icon={<MailIcon />} />
       </div>
 
       {contactHref ? (
         <a
           href={contactHref}
           aria-label={`Contact ${workerName} by email`}
-          className="inline-flex w-fit items-center justify-center rounded-xl bg-brand-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy/90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-navy active:bg-brand-navy/80"
+          className="notch-btn relative flex w-full items-center justify-center !rounded-none bg-brand-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy/90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-navy active:bg-brand-navy/80"
         >
           {CONTACT_WORKER_LABEL}
         </a>
       ) : (
         <div>
-          <Button variant="dark" disabled aria-disabled="true">
+          <Button variant="dark" disabled aria-disabled="true" className="notch-btn w-full !rounded-none">
             {CONTACT_WORKER_LABEL}
           </Button>
           <span className="sr-only">{CONTACT_UNAVAILABLE_HINT}</span>

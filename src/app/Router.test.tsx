@@ -34,7 +34,7 @@ describe('Router', () => {
   it('renders the job seeker placeholder page at /seeker/search', async () => {
     renderRouter('/seeker/search')
 
-    expect(await screen.findByRole('heading', { name: /search for workers/i })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /search workers/i })).toBeInTheDocument()
   })
 
   it('redirects an unknown path to the landing page', async () => {

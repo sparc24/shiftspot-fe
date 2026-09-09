@@ -83,4 +83,39 @@ describe('WorkerCard', () => {
     const link = screen.getByRole('link')
     expect(link.parentElement).toHaveAttribute('role', 'listitem')
   })
+
+  // Penpot design-alignment regression guard (commit 128146e): the card
+  // wrapper switched from a plain rounded/border box to the notch-panel
+  // treatment, and the avatar switched from navy to amber. These are
+  // structural class checks, not a CSS-rendering test — jsdom can't render
+  // the notch clip-path itself.
+  it('WorkerCard_withWorker_appliesNotchPanelClassToCardLink', () => {
+    const worker = createWorkerView()
+
+    renderCard(worker)
+
+    expect(screen.getByRole('link')).toHaveClass('notch-panel')
+  })
+
+  it('WorkerCard_withWorker_rendersAvatarWithAmberStylingNotNavy', () => {
+    const worker = createWorkerView()
+
+    renderCard(worker)
+
+    const avatar = screen.getByText('JD')
+    expect(avatar).toHaveClass('bg-brand-amber-bg', 'text-brand-amber')
+    expect(avatar).not.toHaveClass('bg-brand-navy', 'text-white')
+  })
+
+  // Penpot design-alignment regression guard (commit cc5d423): the worker
+  // name heading switched from a serif/bold treatment to sans/semibold.
+  it('WorkerCard_withWorker_nameHeadingUsesSansSemiboldNotSerifBold', () => {
+    const worker = createWorkerView()
+
+    renderCard(worker)
+
+    const heading = screen.getByRole('heading', { name: 'Jane Doe' })
+    expect(heading).toHaveClass('text-lg', 'font-semibold')
+    expect(heading).not.toHaveClass('font-serif', 'font-bold', 'text-base')
+  })
 })
