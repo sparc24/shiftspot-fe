@@ -108,6 +108,20 @@ describe('WorkerRegistrationPage', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Registration failed. Please try again.')
   })
 
+  it('renders "Registration failed" (not "Profile already exists") as the heading for a non-duplicate error code', () => {
+    mockedUseWorkerRegistration.mockReturnValue(
+      createMutation({
+        isError: true,
+        error: { code: 'NETWORK_ERROR', message: 'Network Error' },
+      }),
+    )
+
+    renderPage()
+
+    expect(screen.getByText('Registration failed')).toBeInTheDocument()
+    expect(screen.queryByText(/profile already exists/i)).not.toBeInTheDocument()
+  })
+
   it('calls mutate with the submitted form values', async () => {
     const user = userEvent.setup()
     const mutation = createMutation()

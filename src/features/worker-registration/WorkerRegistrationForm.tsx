@@ -27,6 +27,7 @@ export function WorkerRegistrationForm({
     handleSubmit,
     control,
     setError,
+    setFocus,
     formState: { errors },
   } = useForm<WorkerRegistrationFormValues>({
     resolver: zodResolver(workerRegistrationSchema),
@@ -47,12 +48,20 @@ export function WorkerRegistrationForm({
   // page renders.
   useEffect(() => {
     if (!serverFieldErrors) return
-    for (const [fieldName, message] of Object.entries(serverFieldErrors) as Array<
-      [DuplicateField, string]
-    >) {
+    const fieldEntries = Object.entries(serverFieldErrors) as Array<[DuplicateField, string]>
+    for (const [fieldName, message] of fieldEntries) {
       setError(fieldName, { type: 'server', message })
     }
-  }, [serverFieldErrors, setError])
+    // `shouldFocusError` only covers resolver failures — server-side errors
+    // applied via setError above don't move focus on their own, leaving a
+    // keyboard/screen-reader user stranded on the (re-enabled) submit button.
+    // Move focus to the first server-errored field, guarded so this only
+    // fires when at least one field error was actually applied.
+    const [firstField] = fieldEntries
+    if (firstField) {
+      setFocus(firstField[0])
+    }
+  }, [serverFieldErrors, setError, setFocus])
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">

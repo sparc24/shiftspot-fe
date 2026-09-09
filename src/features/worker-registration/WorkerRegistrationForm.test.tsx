@@ -158,6 +158,46 @@ describe('WorkerRegistrationForm', () => {
     expect(screen.getByLabelText(/phone number/i)).toHaveAttribute('aria-invalid', 'true')
   })
 
+  it('moves focus to the email field when serverFieldErrors includes email', async () => {
+    renderForm({
+      serverFieldErrors: {
+        email: 'A profile with this Email already exists.',
+        phone: 'A profile with this Phone Number already exists.',
+      },
+    })
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/email id/i)).toHaveFocus()
+    })
+  })
+
+  it('moves focus to the phone field when serverFieldErrors only includes phone', async () => {
+    renderForm({
+      serverFieldErrors: {
+        phone: 'A profile with this Phone Number already exists.',
+      },
+    })
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/phone number/i)).toHaveFocus()
+    })
+  })
+
+  it('does not move focus when serverFieldErrors is undefined', async () => {
+    renderForm()
+
+    expect(screen.getByLabelText(/^name/i)).not.toHaveFocus()
+    expect(screen.getByLabelText(/email id/i)).not.toHaveFocus()
+    expect(screen.getByLabelText(/phone number/i)).not.toHaveFocus()
+    expect(document.body).toHaveFocus()
+  })
+
+  it('does not move focus when serverFieldErrors is an empty object', async () => {
+    renderForm({ serverFieldErrors: {} })
+
+    expect(document.body).toHaveFocus()
+  })
+
   it('navigates back to the landing page when Cancel is clicked', async () => {
     const user = userEvent.setup()
     renderForm()

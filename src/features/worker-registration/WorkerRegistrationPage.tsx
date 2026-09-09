@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 
 import { SuccessMessage } from '@/shared/components'
 import { useWorkerRegistration } from '@/shared/hooks'
+import { isDuplicateWorkerError } from '@/shared/types'
 import type { WorkerRegistrationFormValues } from '@/shared/validation'
 
 import { WorkerRegistrationForm } from './WorkerRegistrationForm'
@@ -25,10 +26,10 @@ export function WorkerRegistrationPage() {
     mutation.mutate(values)
   }
 
-  const bannerMessage = mutation.isError
-    ? (mutation.error.fieldErrors && Object.keys(mutation.error.fieldErrors).length > 0
-        ? mutation.error.message
-        : 'Registration failed. Please try again.')
+  const banner = mutation.isError
+    ? (isDuplicateWorkerError(mutation.error)
+        ? { title: 'Profile already exists', body: mutation.error.message }
+        : { title: 'Registration failed', body: 'Registration failed. Please try again.' })
     : null
 
   return (
@@ -55,7 +56,7 @@ export function WorkerRegistrationPage() {
               Worker Registration
             </h1>
 
-            {bannerMessage ? (
+            {banner ? (
               <div role="alert" className="relative mx-auto mt-6 max-w-xl overflow-hidden rounded-[10px] bg-brand-amber-bg p-4 pl-5">
                 <span aria-hidden="true" className="absolute inset-y-4 left-0 w-1 rounded-full bg-brand-amber" />
                 <div className="flex items-start gap-3">
@@ -66,8 +67,8 @@ export function WorkerRegistrationPage() {
                     !
                   </span>
                   <div>
-                    <p className="font-semibold text-brand-navy">Profile already exists</p>
-                    <p className="mt-1 text-sm text-brand-muted">{bannerMessage}</p>
+                    <p className="font-semibold text-brand-navy">{banner.title}</p>
+                    <p className="mt-1 text-sm text-brand-muted">{banner.body}</p>
                   </div>
                 </div>
               </div>
