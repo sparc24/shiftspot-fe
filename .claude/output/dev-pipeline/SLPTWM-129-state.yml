@@ -1,6 +1,6 @@
 ticketId: "SLPTWM-129"
 workflowType: "full"
-currentStep: "jira-done"
+currentStep: "pr-opened"
 completedSteps:
   - parent-branch-selection
   - task-classification
@@ -12,6 +12,9 @@ completedSteps:
   - block-a
   - block-b
   - rebase-health
+  - jira-done
+  - jira-comment
+  - pr-opened
 parentBranch: "develop"
 branchName: "feature/SLPTWM-129-worker-api-integration"
 diverged: false
@@ -102,7 +105,7 @@ prSummary: |
   yet despite the OpenAPI spec declaring it). Code review caught and fixed a banner bug where non-duplicate
   failures (network/400/5xx) incorrectly showed "Profile already exists" instead of a generic failure
   message. 232 tests pass with 97-100% coverage on every changed file.
-prUrl: ""
+prUrl: "https://github.com/sparc24/shiftspot-fe/pull/5"
 confidentialDataOverridden: false
 
 mcpStatus:
