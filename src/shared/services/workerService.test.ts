@@ -1,79 +1,68 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { WorkerRegistrationPayload } from '@/shared/types'
+import { workerApi } from '@/shared/api/workerApi'
+import type { ApiError, Worker, WorkerRegistrationPayload } from '@/shared/types'
 
-const basePayload: WorkerRegistrationPayload = {
-  name: 'Jane Doe',
-  email: 'jane@example.com',
-  phone: '9876543210',
-  location: 'New York',
-  age: 25,
-  skills: ['plumbing'],
+import { workerService } from './workerService'
+
+function createPayload(overrides: Partial<WorkerRegistrationPayload> = {}): WorkerRegistrationPayload {
+  return {
+    name: 'Jane Doe',
+    email: 'jane.doe@example.com',
+    phone: '9876543210',
+    location: 'New York',
+    age: 25,
+    skills: ['plumbing'],
+    ...overrides,
+  }
 }
 
+function createWorker(overrides: Partial<Worker> = {}): Worker {
+  return {
+    id: 'worker-123',
+    name: 'Jane Doe',
+    email: 'jane.doe@example.com',
+    phone: '9876543210',
+    location: 'New York',
+    age: 25,
+    skills: ['plumbing'],
+    ...overrides,
+  }
+}
+
+// SLPTWM-129: createWorker now delegates to the live workerApi, not the
+// mock. The mock-specific duplicate-detection assertions that used to live
+// here now belong in workerApi.test.ts — this file only asserts delegation.
 describe('workerService.createWorker', () => {
   beforeEach(() => {
-    vi.resetModules()
+    vi.spyOn(workerApi, 'createWorker')
   })
 
-  it('resolves with a created Worker including id and createdAt', async () => {
-    const { workerService } = await import('./workerService')
-    const worker = await workerService.createWorker(basePayload)
-
-    expect(worker.id).toBeTruthy()
-    expect(worker.createdAt).toBeTruthy()
-    expect(worker.email).toBe(basePayload.email)
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
-  it('rejects with DUPLICATE_EMAIL and a fieldErrors.email message when the same email registers twice', async () => {
-    const { workerService } = await import('./workerService')
-    await workerService.createWorker(basePayload)
+  it('workerService_createWorker_delegatesToWorkerApiWithTheGivenPayload', async () => {
+    const payload = createPayload()
+    const worker = createWorker()
+    vi.mocked(workerApi.createWorker).mockResolvedValue(worker)
 
-    await expect(
-      workerService.createWorker({ ...basePayload, phone: '1112223333' }),
-    ).rejects.toMatchObject({
+    const result = await workerService.createWorker(payload)
+
+    expect(workerApi.createWorker).toHaveBeenCalledWith(payload)
+    expect(result).toEqual(worker)
+  })
+
+  it('workerService_createWorker_whenWorkerApiRejects_propagatesTheErrorUnchanged', async () => {
+    const payload = createPayload()
+    const apiError: ApiError = {
       code: 'DUPLICATE_EMAIL',
+      message: 'A profile with this Email already exists.',
       field: 'email',
       fieldErrors: { email: 'A profile with this Email already exists.' },
-    })
-  })
+    }
+    vi.mocked(workerApi.createWorker).mockRejectedValue(apiError)
 
-  it('rejects with DUPLICATE_PHONE and a fieldErrors.phone message when the same phone registers twice', async () => {
-    const { workerService } = await import('./workerService')
-    await workerService.createWorker(basePayload)
-
-    await expect(
-      workerService.createWorker({ ...basePayload, email: 'someone-else@example.com' }),
-    ).rejects.toMatchObject({
-      code: 'DUPLICATE_PHONE',
-      field: 'phone',
-      fieldErrors: { phone: 'A profile with this Phone Number already exists.' },
-    })
-  })
-
-  it('rejects with both fieldErrors when email and phone are both already registered', async () => {
-    const { workerService } = await import('./workerService')
-    await workerService.createWorker(basePayload)
-
-    await expect(workerService.createWorker(basePayload)).rejects.toMatchObject({
-      code: 'DUPLICATE_EMAIL_AND_PHONE',
-      fieldErrors: {
-        email: 'A profile with this Email already exists.',
-        phone: 'A profile with this Phone Number already exists.',
-      },
-    })
-  })
-
-  it('resolves independently for two different emails and phones', async () => {
-    const { workerService } = await import('./workerService')
-    const first = await workerService.createWorker(basePayload)
-    const second = await workerService.createWorker({
-      ...basePayload,
-      email: 'jordan@example.com',
-      phone: '1112223333',
-    })
-
-    expect(first.id).not.toBe(second.id)
-    expect(second.email).toBe('jordan@example.com')
+    await expect(workerService.createWorker(payload)).rejects.toEqual(apiError)
   })
 })
