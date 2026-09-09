@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 
 import { SuccessMessage } from '@/shared/components'
 import { useWorkerRegistration } from '@/shared/hooks'
+import { isDuplicateWorkerError } from '@/shared/types'
 import type { WorkerRegistrationFormValues } from '@/shared/validation'
 
 import { WorkerRegistrationForm } from './WorkerRegistrationForm'
@@ -26,7 +27,7 @@ export function WorkerRegistrationPage() {
   }
 
   const bannerMessage = mutation.isError
-    ? (mutation.error.fieldErrors && Object.keys(mutation.error.fieldErrors).length > 0
+    ? (isDuplicateWorkerError(mutation.error)
         ? mutation.error.message
         : 'Registration failed. Please try again.')
     : null
