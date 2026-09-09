@@ -25,7 +25,9 @@ export interface WorkerRegistrationPayload {
 
 export interface Worker extends WorkerRegistrationPayload {
   id: string
-  createdAt: string
+  /** Not returned by POST /api/v1/workers — the backend does not expose a creation
+   *  timestamp. Present on mock-sourced workers only. Never rendered by any screen. */
+  createdAt?: string
 }
 
 // Grid order matches the design: row 1 = Plumbing, Electrical, Gardening;
@@ -61,7 +63,24 @@ export const WORKER_NOT_FOUND = 'WORKER_NOT_FOUND'
 export interface ApiError {
   code: string
   message: string
+  /** HTTP status when the failure came from a response (absent for network/offline failures). */
+  status?: number
   field?: keyof WorkerRegistrationPayload
   /** Per-field messages for every duplicated field, so the caller can `setError` each one individually. */
   fieldErrors?: Partial<Record<DuplicateField, string>>
+}
+
+// Duplicate-detection codes emitted by both the mock API and the live
+// workerApi (409 translation) — kept as one set so isDuplicateWorkerError
+// recognises errors from either source identically.
+export const DUPLICATE_WORKER_CODES = [
+  'DUPLICATE_EMAIL',
+  'DUPLICATE_PHONE',
+  'DUPLICATE_EMAIL_AND_PHONE',
+] as const
+
+export type DuplicateWorkerCode = (typeof DUPLICATE_WORKER_CODES)[number]
+
+export function isDuplicateWorkerError(error: ApiError | null | undefined): boolean {
+  return !!error && (DUPLICATE_WORKER_CODES as readonly string[]).includes(error.code)
 }
